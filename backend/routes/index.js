@@ -726,8 +726,11 @@ HWProc.on('message', (message) => {
 router.setSocketIo = (io) => {
 
     HWProc.io = io;
+        console.log('*****************', 'one')
 
     HWProc.dataEvents = io.of('/data').on('connection', function (socket) {
+        console.log('*****************', 'three')
+        emitModuleUpdate('hello');
         socket.on('message', function (data) {
             console.log(data);
         });
@@ -741,9 +744,11 @@ router.setSocketIo = (io) => {
 
 }
 
+console.log('*****************', 'two')
 
 
 function emitModuleUpdate(modObject) {
+    console.log('function called', modObject)
      HWProc.dataEvents.emit('module', modObject);
 }
 
