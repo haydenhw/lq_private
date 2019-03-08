@@ -2,7 +2,7 @@
 'use strict';
 
 var fs = require('fs');
-const print= require('../utility/print');
+const print = require('../utility/print');
 
 function clonify(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -267,7 +267,7 @@ function constructServerMessage(messageBackToServer, rewriteCmd) {
 
 //
 var gWritesOK = false;
-lineParserHandler('CRXZeePrime,LIMIT:temperature,LEVEL:HIGH');
+// lineParserHandler('CRXZeePrime,LIMIT:temperature,LEVEL:HIGH');
 function lineParserHandler(str) {
 
     console.log("lineParserHandler->" + str)
@@ -299,6 +299,8 @@ function lineParserHandler(str) {
 
         //
         var srvMsg = constructServerMessage(messageBackToServer, "CRX-LIMIT");
+        console.log('**SrvMsg**');
+        console.log(srvMsg, '\n\n');
         if (srvMsg && process.send) {
             if (srvMsg.message.LIMIT === "temperature") srvMsg.message.LIMIT = "Heater";
             process.send(srvMsg);
