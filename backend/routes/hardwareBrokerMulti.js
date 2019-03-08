@@ -244,7 +244,15 @@ function constructServerMessage(messageBackToServer, rewriteCmd) {
     var splitMessage = messageBackToServer.split(',');
     var mm = splitMessage.shift().trim();
     var srverData = gMCUPreambles[mm];
-
+    console.log()
+    console.log('**gMCUPreambles**')  
+    console.log(gMCUPreambles)
+    console.log()
+    console.log()
+    console.log('**mm**')
+    console.log(mm)
+    console.log()
+    console.log()
     if (srverData !== undefined) {
         while (splitMessage.length) {
             var pair = splitMessage.shift().trim();
@@ -299,8 +307,10 @@ function lineParserHandler(str) {
 
         //
         var srvMsg = constructServerMessage(messageBackToServer, "CRX-LIMIT");
+        console.log()
         console.log('**SrvMsg**');
-        console.log(srvMsg, '\n\n');
+        console.log(srvMsg);
+        console.log()
         if (srvMsg && process.send) {
             if (srvMsg.message.LIMIT === "temperature") srvMsg.message.LIMIT = "Heater";
             process.send(srvMsg);
