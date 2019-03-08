@@ -681,6 +681,8 @@ HWProc.on('message', (message) => {
                                       // or other source.  Let the hardwareBroker format the command
                                       // --
                                       // turn on or off the element defined by the limit report
+                                    //   console.log('**Message to hardware broker**');
+                                    //   console.log(msg);
                                       HWProc.send(msg);   // BACK to process
                                       //
                                       var reactionSet = userRAssets.activeReactions();

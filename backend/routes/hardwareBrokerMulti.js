@@ -2,9 +2,9 @@
 'use strict';
 
 var fs = require('fs');
+const print= require('../utility/print');
 
-
-function clonify (obj) {
+function clonify(obj) {
     return JSON.parse(JSON.stringify(obj));
 }
 
@@ -28,7 +28,7 @@ var timeCmd = `initT,cmd:STME,mins:${allminutes},day:${gCurrentModuleTime_DOM},m
 
 var config = require('./dosisConfig.js')
 
-function setupConfiguration (aConfig) {
+function setupConfiguration(aConfig) {
     //
     if (aConfig.hardwarePins == undefined) {
         aConfig.hardwarePins = {}
@@ -68,7 +68,7 @@ function setupConfiguration (aConfig) {
 }
 
 
-function initializationSequence (uPort) {
+function initializationSequence(uPort) {
 
     var mcu = ""
     for (var matchMCU in gMCUPortMap) {
@@ -85,7 +85,7 @@ function initializationSequence (uPort) {
 }
 
 
-function initializationNext (str) {
+function initializationNext(str) {
     //
     console.log(str);
     //
@@ -134,7 +134,7 @@ setupConfiguration(config)
 
 // ----------------
 
-function sendAck () {
+function sendAck() {
     if (process.send) {
         process.send({ message: "ACK" });
     }
@@ -191,7 +191,7 @@ if (typeof uartsAll !== 'undefined') {  // use Serial Port class. Baud rate in c
 
 
 
-function operationMessage (msg) {
+function operationMessage(msg) {
     //
     if (typeof msg === "string") {
         msg += "\n"
@@ -205,7 +205,7 @@ function operationMessage (msg) {
 }
 
 
-function stateFromString (value, heldHigh) {
+function stateFromString(value, heldHigh) {
     //
     if (value === 1 || value === 0) return (value);
     //
@@ -237,7 +237,7 @@ function stateFromString (value, heldHigh) {
 //------------ ------------ ------------ ------------ ------------ ----------
 
 
-function constructServerMessage (messageBackToServer, rewriteCmd) {
+function constructServerMessage(messageBackToServer, rewriteCmd) {
     //
     messageBackToServer = messageBackToServer.trim();
     // auto switch a machine state per config
@@ -267,8 +267,8 @@ function constructServerMessage (messageBackToServer, rewriteCmd) {
 
 //
 var gWritesOK = false;
-
-function lineParserHandler (str) {
+lineParserHandler('CRXZeePrime,LIMIT:temperature,LEVEL:HIGH');
+function lineParserHandler(str) {
 
     console.log("lineParserHandler->" + str)
 
@@ -296,6 +296,7 @@ function lineParserHandler (str) {
     if (str.indexOf("CRX") == 0) {
         // handle sensor cross over response.
         var messageBackToServer = str.substr(3); // use the rest of it
+
         //
         var srvMsg = constructServerMessage(messageBackToServer, "CRX-LIMIT");
         if (srvMsg && process.send) {
@@ -377,7 +378,7 @@ if (uartPorts) {
 
 }
 
-function isStateRequest (serverMessage) {
+function isStateRequest(serverMessage) {
     if (serverMessage.type !== undefined) {
         if (serverMessage.type === "query") {
             return (true);
@@ -387,7 +388,7 @@ function isStateRequest (serverMessage) {
 }
 
 
-function isLimitRequest (serverMessage) {
+function isLimitRequest(serverMessage) {
     if (serverMessage.type !== undefined) {
         if (serverMessage.type === "limit") {
             return (true);
@@ -397,7 +398,7 @@ function isLimitRequest (serverMessage) {
 }
 
 
-function sendStateRequest (serverMessage) {
+function sendStateRequest(serverMessage) {
     // message...
     var moduleObj = gModuleOutputs[serverMessage.dest];
     if (moduleObj) {
@@ -438,7 +439,7 @@ function sendStateRequest (serverMessage) {
 */
 
 
-function sendLimitCommand (serverMessage) {
+function sendLimitCommand(serverMessage) {
     var moduleObj = gModuleOutputs[serverMessage.dest];
     if (moduleObj) {
         var mcu = moduleObj.mcu;
@@ -471,13 +472,16 @@ function sendLimitCommand (serverMessage) {
 }
 
 
-function messageToHardware (serverMessage) {
+function messageToHardware(serverMessage) {
 
     // The message is going to this hardware.
     //  hPins is from the configuration.
     var module = gModuleOutputs[serverMessage.dest];   /// the field 'from' selects the pin descriptor. (e.g. IRState);
     /// 'from' identifies element first coming from the web page.
     var data = serverMessage.data;
+
+    // console.log('**module from messageToHardware function**');
+    // console.log(module);
 
     if (module) {                    ///  The def was there.
 
@@ -612,7 +616,6 @@ function messageToHardware (serverMessage) {
         }
 
         //
-        console.log(messageList);
 
         if (messageList.length) {
             if (mcu) {
@@ -623,6 +626,8 @@ function messageToHardware (serverMessage) {
                         //
                         var opMessage = operationMessage(message);
                         if (opMessage.length) {
+                            console.log('\n\n\n**Operation Message**\n');
+                            console.log(opMessage, '\n\n\n')
                             uartPort.write(opMessage, () => {  // write the message with a callback.
                                 console.log('Write:\t\t Complete!');
                                 // do an ack here if you want...
@@ -652,7 +657,7 @@ function messageToHardware (serverMessage) {
 var gACLTimer = {};
 
 
-function watchACKTimer (mid) {
+function watchACKTimer(mid) {
     if (gACLTimer[mid] === null || gACLTimer[mid] === undefined) {
         gACLTimer[mid] = setTimeout(() => {
             if (!gACKReceived[mid]) {
@@ -662,7 +667,7 @@ function watchACKTimer (mid) {
     }
 }
 
-function haltACKTimer (mid) {
+function haltACKTimer(mid) {
     if (gACLTimer[mid] !== null && gACLTimer[mid] !== undefined) {
         clearTimeout(gACLTimer[mid]);
         gACLTimer[mid] = null;
@@ -670,7 +675,7 @@ function haltACKTimer (mid) {
 }
 
 
-function dequeueMessageOnACK (mid) {
+function dequeueMessageOnACK(mid) {
     //
     var mkey = "" + mid;
     if (gACKCmdQueue[mkey] == undefined) {
@@ -682,6 +687,9 @@ function dequeueMessageOnACK (mid) {
         haltACKTimer(mkey);  // no longer needed
         var message = gACKCmdQueue[mkey].shift();
         gACKReceived[mid] = false;
+
+        console.log('**Message in dequeueMessageOnACK**');
+        console.log(message);
 
         if (isStateRequest(message)) {
             sendStateRequest(message);
@@ -703,7 +711,7 @@ function dequeueMessageOnACK (mid) {
 
 
 
-function handleMessages (message) {
+function handleMessages(message) {
     //
     var mkey = "" + message.dest;
     //
