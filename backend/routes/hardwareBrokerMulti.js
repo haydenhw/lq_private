@@ -244,15 +244,15 @@ function constructServerMessage(messageBackToServer, rewriteCmd) {
     var splitMessage = messageBackToServer.split(',');
     var mm = splitMessage.shift().trim();
     var srverData = gMCUPreambles[mm];
-    console.log()
-    console.log('**gMCUPreambles**')  
-    console.log(gMCUPreambles)
-    console.log()
-    console.log()
-    console.log('**mm**')
-    console.log(mm)
-    console.log()
-    console.log()
+    // console.log()
+    // console.log('**gMCUPreambles**')  
+    // console.log(gMCUPreambles)
+    // console.log()
+    // console.log()
+    // console.log('**mm**')
+    // console.log(mm)
+    // console.log()
+    // console.log()
     if (srverData !== undefined) {
         while (splitMessage.length) {
             var pair = splitMessage.shift().trim();
