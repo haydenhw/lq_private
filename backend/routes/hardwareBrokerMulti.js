@@ -4,11 +4,9 @@
 var fs = require('fs');
 const print = require('../utility/print');
 
-function clonify(obj) {
+function clonify (obj) {
     return JSON.parse(JSON.stringify(obj));
 }
-
-
 
 var gACKReceived = {};
 var gACKCmdQueue = {};
@@ -28,7 +26,7 @@ var timeCmd = `initT,cmd:STME,mins:${allminutes},day:${gCurrentModuleTime_DOM},m
 
 var config = require('./dosisConfig.js')
 
-function setupConfiguration(aConfig) {
+function setupConfiguration (aConfig) {
     //
     if (aConfig.hardwarePins == undefined) {
         aConfig.hardwarePins = {}
@@ -68,7 +66,7 @@ function setupConfiguration(aConfig) {
 }
 
 
-function initializationSequence(uPort) {
+function initializationSequence (uPort) {
 
     var mcu = ""
     for (var matchMCU in gMCUPortMap) {
@@ -85,7 +83,7 @@ function initializationSequence(uPort) {
 }
 
 
-function initializationNext(str) {
+function initializationNext (str) {
     //
     console.log(str);
     //
@@ -134,7 +132,7 @@ setupConfiguration(config)
 
 // ----------------
 
-function sendAck() {
+function sendAck () {
     if (process.send) {
         process.send({ message: "ACK" });
     }
@@ -191,7 +189,7 @@ if (typeof uartsAll !== 'undefined') {  // use Serial Port class. Baud rate in c
 
 
 
-function operationMessage(msg) {
+function operationMessage (msg) {
     //
     if (typeof msg === "string") {
         msg += "\n"
@@ -205,7 +203,7 @@ function operationMessage(msg) {
 }
 
 
-function stateFromString(value, heldHigh) {
+function stateFromString (value, heldHigh) {
     //
     if (value === 1 || value === 0) return (value);
     //
@@ -237,22 +235,19 @@ function stateFromString(value, heldHigh) {
 //------------ ------------ ------------ ------------ ------------ ----------
 
 
-function constructServerMessage(messageBackToServer, rewriteCmd) {
+function constructServerMessage (messageBackToServer, rewriteCmd) {
     //
     messageBackToServer = messageBackToServer.trim();
     // auto switch a machine state per config
     var splitMessage = messageBackToServer.split(',');
     var mm = splitMessage.shift().trim();
     var srverData = gMCUPreambles[mm];
-    // console.log()
-    // console.log('**gMCUPreambles**')  
-    // console.log(gMCUPreambles)
-    // console.log()
-    // console.log()
-    // console.log('**mm**')
-    // console.log(mm)
-    // console.log()
-    // console.log()
+    console.log()
+    console.log()
+    console.log('**gMCUPreambles**')
+    console.log(gMCUPreambles)
+    console.log()
+    console.log()
     if (srverData !== undefined) {
         while (splitMessage.length) {
             var pair = splitMessage.shift().trim();
@@ -272,11 +267,32 @@ function constructServerMessage(messageBackToServer, rewriteCmd) {
 
 //------------ ------------ ------------ ------------ ------------ ----------
 
+const initTestPreambles = () => {
+    gMCUPreambles = {
+        ZeePrime:
+        {
+            id: '5c2ecc2d87d0b75cbd3ed23d',
+            cmd: 'query',
+            module: 'ZeePrime'
+        }
+    };
+}
 
 //
-var gWritesOK = false;
+
+const mockCRXMessage = () => {
+    print('!!!CRX Gen')
+    initTestPreambles();
+    const CRXMessage = 'CRXZeePrime,LIMIT: temperature,LEVEL: HIGH';
+    lineParserHandler(CRXMessage);
+}
+
+// process.nextTick(mockCRXMessage);
+
+
 // lineParserHandler('CRXZeePrime,LIMIT:temperature,LEVEL:HIGH');
-function lineParserHandler(str) {
+var gWritesOK = false;
+function lineParserHandler (str) {
 
     console.log("lineParserHandler->" + str)
 
@@ -390,7 +406,7 @@ if (uartPorts) {
 
 }
 
-function isStateRequest(serverMessage) {
+function isStateRequest (serverMessage) {
     if (serverMessage.type !== undefined) {
         if (serverMessage.type === "query") {
             return (true);
@@ -400,7 +416,7 @@ function isStateRequest(serverMessage) {
 }
 
 
-function isLimitRequest(serverMessage) {
+function isLimitRequest (serverMessage) {
     if (serverMessage.type !== undefined) {
         if (serverMessage.type === "limit") {
             return (true);
@@ -410,7 +426,7 @@ function isLimitRequest(serverMessage) {
 }
 
 
-function sendStateRequest(serverMessage) {
+function sendStateRequest (serverMessage) {
     // message...
     var moduleObj = gModuleOutputs[serverMessage.dest];
     if (moduleObj) {
@@ -442,16 +458,16 @@ function sendStateRequest(serverMessage) {
 
 
 /*
-
+ 
   Serial.print("DBG=>handleReportCmd ");
   Serial.print(stateStr);
   Serial.print(",");
   Serial.println(ky_ON);
-
+ 
 */
 
 
-function sendLimitCommand(serverMessage) {
+function sendLimitCommand (serverMessage) {
     var moduleObj = gModuleOutputs[serverMessage.dest];
     if (moduleObj) {
         var mcu = moduleObj.mcu;
@@ -484,7 +500,7 @@ function sendLimitCommand(serverMessage) {
 }
 
 
-function messageToHardware(serverMessage) {
+function messageToHardware (serverMessage) {
 
     // The message is going to this hardware.
     //  hPins is from the configuration.
@@ -492,7 +508,7 @@ function messageToHardware(serverMessage) {
     /// 'from' identifies element first coming from the web page.
     var data = serverMessage.data;
 
-    console.log('\n\n','**module from messageToHardware function**');
+    console.log('\n\n', '**module from messageToHardware function**');
     console.log(module, '\n\n');
 
     if (module) {                    ///  The def was there.
@@ -669,7 +685,7 @@ function messageToHardware(serverMessage) {
 var gACLTimer = {};
 
 
-function watchACKTimer(mid) {
+function watchACKTimer (mid) {
     if (gACLTimer[mid] === null || gACLTimer[mid] === undefined) {
         gACLTimer[mid] = setTimeout(() => {
             if (!gACKReceived[mid]) {
@@ -679,7 +695,7 @@ function watchACKTimer(mid) {
     }
 }
 
-function haltACKTimer(mid) {
+function haltACKTimer (mid) {
     if (gACLTimer[mid] !== null && gACLTimer[mid] !== undefined) {
         clearTimeout(gACLTimer[mid]);
         gACLTimer[mid] = null;
@@ -687,7 +703,7 @@ function haltACKTimer(mid) {
 }
 
 
-function dequeueMessageOnACK(mid) {
+function dequeueMessageOnACK (mid) {
     //
     var mkey = "" + mid;
     if (gACKCmdQueue[mkey] == undefined) {
@@ -723,7 +739,7 @@ function dequeueMessageOnACK(mid) {
 
 
 
-function handleMessages(message) {
+function handleMessages (message) {
     //
     var mkey = "" + message.dest;
     //
