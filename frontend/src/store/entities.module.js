@@ -3,7 +3,7 @@ import { normalize } from 'normalizr';
 import router from '@/router';
 import callApi from '@/utils/ApiUtils.js';
 
-import { moduleSchema } from '@/constants/Schemas';
+import { moduleSchema } from '@/constants/schemas';
 import { MODULES_URL, UPDATE_STATE_URL } from '@/constants/ApiConstants';
 import { modulesInitial } from './entities.initialState.js';
 import { UPDATE_LAMP } from './actions.types';

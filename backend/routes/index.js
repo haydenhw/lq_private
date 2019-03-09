@@ -698,7 +698,7 @@ HWProc.on('message', (message) => {
                   } else {   // SEND SENSOR DATA
                       //
                       //console.log(message)
-                    //   HWProc.dataEvents.emit('datum', message);
+                      HWProc.dataEvents.emit('datum', message);
                       var storeData = message.message;
                       if ( storeData && storeData.OD && storeData.Temperature && storeData.id && !IamCloud ) {
                           if ( !(isNaN(storeData.OD) || isNaN(storeData.Temperature)) ) {
@@ -730,7 +730,12 @@ router.setSocketIo = (io) => {
 
     HWProc.dataEvents = io.of('/data').on('connection', function (socket) {
         console.log('*****************', 'three')
-        emitModuleUpdate('hello');
+        let count = 0;
+
+        setInterval(() => {
+          emitModuleUpdate(count++);
+        }, 1000)
+
         socket.on('message', function (data) {
             console.log(data);
         });
