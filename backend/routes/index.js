@@ -4,7 +4,7 @@ var fs = require('fs');
 var print = require('../utility/print');
 const influx = require('influx');
 
-
+let HWProc;
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 var Reaction = require('../models/reaction');
@@ -542,20 +542,6 @@ if (IamCloud) {
 
 // --------------------------------------------------------------------
 
-const initTestRootAssets = () => {
-    print('!! Test Init Func')
-    const testUserId = '5a4d2877e826b94a6da52b78';
-    const mockRes = {
-        json () { },
-        render () { },
-    }
-
-    loadRootAssets(testUserId, null, mockRes);
-
-    print('@@ gReactionsToUser');
-    console.log(gReactionsToUser);
-};
-
 
 
 
@@ -564,7 +550,7 @@ const { spawn } = require('child_process');
 
 // Spawn a child process. Let node.js hadle the communication.
 
-const HWProc = spawn('node', hwProcParams,
+HWProc = spawn('node', hwProcParams,
     {
         stdio: [process.stdin, process.stdout, process.stderr, 'ipc']
     });
@@ -836,11 +822,16 @@ global.loadRootAssets = (userId, renderPage, res) => {
                 gReactionsToUser[reaction.id] = userRAssets;
             });
 
-            console.log('## gReactionsToUser');
-            console.log(gReactionsToUser);
+            // console.log('## gReactionsToUser');
+            // console.log(gReactionsToUser);
 
             userRAssets.setUpdated("reactions")
             userRAssets.setEdited(false);
+
+            // testState.assetsLoaded = true; 
+            // print('%%%% test state updates')
+            // console.log(testState);
+            HWProc.send('TRIGGER_TEST');
 
             renderPage
                 ? res.render(renderPage, { "modules": moduleList })
@@ -855,8 +846,7 @@ global.loadRootAssets = (userId, renderPage, res) => {
 
 }
 
-
-router.get(g_Root, ensureAuthenticated, function (req, res) {
+   router.get(g_Root, ensureAuthenticated, function (req, res) {
     //
     var userId = req.user.id;
     if (!IamCloud) {
@@ -867,6 +857,20 @@ router.get(g_Root, ensureAuthenticated, function (req, res) {
     //
 });
 
+const initTestRootAssets = () => {
+    print('!! Test Init Func')
+    const testUserId = '5a4d2877e826b94a6da52b78';
+    const mockRes = {
+        json () { },
+        render () { },
+    }
+
+    loadRootAssets(testUserId, null, mockRes);
+
+};
+
+// DEL
+initTestRootAssets();
 
 //
 router.get(gURL_allActiveReactions, ensureAuthenticated, function (req, res) {

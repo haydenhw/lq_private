@@ -1,5 +1,7 @@
 /* eslint-disable node/no-missing-require */
 'use strict';
+const testState = require('./testState');
+// require test state
 
 var fs = require('fs');
 const print = require('../utility/print');
@@ -287,10 +289,6 @@ const mockCRXMessage = () => {
     lineParserHandler(CRXMessage);
 }
 
-// process.nextTick(mockCRXMessage);
-
-
-// lineParserHandler('CRXZeePrime,LIMIT:temperature,LEVEL:HIGH');
 var gWritesOK = false;
 function lineParserHandler (str) {
 
@@ -772,6 +770,12 @@ process.on('message', (message) => {
     console.log("messageToHardware")
     console.dir(message, { depth: 4 });
     console.log("__");
+
+    if (message === 'TRIGGER_TEST') {
+        mockCRXMessage();       
+        return;
+    };
+
     //
     haltACKTimer("" + message.dest)
     handleMessages(message);
