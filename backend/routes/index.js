@@ -652,10 +652,21 @@ HWProc.on('message', (message) => {
 
             var userRAssets = gReactionsToUser[rid];
 
-            print('userRAssets')
-            console.log(userRAssets);
+            // print('userRAssets')
+            // console.log(userRAssets);
 
             var modObj = userRAssets.getModule(mid);
+            
+            // DEL
+            modObj.moduleState.Heater = true;
+            console.log()
+            console.log()
+            console.log('** pars **');  
+            console.log()
+            console.log()
+            // print(modObj.parameters);
+
+
             if (modObj.limits !== undefined) {
                 if (modObj.limits[swtch] !== undefined) {
                     // get the state that corrects the limit violation.
@@ -681,7 +692,7 @@ HWProc.on('message', (message) => {
                             if ((modObj.parameters !== undefined) && (modObj.parameters[swtch] !== undefined)) {
                                 var pars = modObj.parameters[swtch];
                                 for (var pkey in pars) {
-                                    msg.data[pkey] = pars[pars];
+                                    msg.data[pkey] = pars[pkey];
                                 }
                                 if (msg.data.stop !== undefined) {
                                     msg.data.start = msg.data.stop;
@@ -858,7 +869,7 @@ global.loadRootAssets = (userId, renderPage, res) => {
 });
 
 const initTestRootAssets = () => {
-    print('!! Test Init Func')
+    // print('!! Test Init Func')
     const testUserId = '5a4d2877e826b94a6da52b78';
     const mockRes = {
         json () { },

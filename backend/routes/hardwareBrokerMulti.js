@@ -506,8 +506,8 @@ function messageToHardware (serverMessage) {
     /// 'from' identifies element first coming from the web page.
     var data = serverMessage.data;
 
-    console.log('\n\n', '**module from messageToHardware function**');
-    console.log(module, '\n\n');
+    // console.log('\n\n', '**module from messageToHardware function**');
+    // console.log(module, '\n\n');
 
     if (module) {                    ///  The def was there.
 
