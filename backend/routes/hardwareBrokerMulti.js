@@ -777,7 +777,7 @@ const constructOD = () => {
 };
 
 const constructSensorMessage = reactor => (
-  `${reactor},OD: ${constructOD()},temperature: ${constructTemp()}`
+  `${reactor},OD: ${constructOD()},Temperature: ${constructTemp()}`
 );
 
 // Handle messages from the web server...
