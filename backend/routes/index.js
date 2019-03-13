@@ -722,7 +722,10 @@ HWProc.on('message', (message) => {
         } else {   // SEND SENSOR DATA
             //
             //console.log(message)
-            //   HWProc.dataEvents.emit('datum', message);
+                    console.log()
+                    print("*****! socket message !*****");
+                    console.log(message);
+              HWProc.dataEvents.emit('datum', message);
             var storeData = message.message;
             if (storeData && storeData.OD && storeData.Temperature && storeData.id && !IamCloud) {
                 if (!(isNaN(storeData.OD) || isNaN(storeData.Temperature))) {

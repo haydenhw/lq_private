@@ -282,11 +282,10 @@ const initTestPreambles = () => {
 
 //
 
-const mockCRXMessage = () => {
-    print('!!!CRX Gen')
+const triggerMockMessage = (msg) => {
+    print('!!! Mocking Message')
     initTestPreambles();
-    const CRXMessage = 'CRXZeePrime,LIMIT: temperature,LEVEL: HIGH';
-    lineParserHandler(CRXMessage);
+    lineParserHandler(msg);
 }
 
 var gWritesOK = false;
@@ -353,6 +352,8 @@ function lineParserHandler (str) {
     if (process.send && messageBackToServer.length) {   // anything to send and a place to send it.
         //
         var srvMsg = constructServerMessage(messageBackToServer, 'sensors');
+        print("***** srvMsg *****");
+        console.log(srvMsg);
         if (srvMsg) {
             process.send(srvMsg);
         }
@@ -772,7 +773,8 @@ process.on('message', (message) => {
     console.log("__");
 
     if (message === 'TRIGGER_TEST') {
-        mockCRXMessage();       
+        const mockMessage = 'ZeePrime,OD: 3.984,Temperature: 33.437';
+        triggerMockMessage(mockMessage);       
         return;
     };
 
@@ -781,4 +783,3 @@ process.on('message', (message) => {
     handleMessages(message);
     //
 });
-
