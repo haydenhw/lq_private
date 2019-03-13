@@ -845,7 +845,11 @@ global.loadRootAssets = (userId, renderPage, res) => {
             // testState.assetsLoaded = true; 
             // print('%%%% test state updates')
             // console.log(testState);
-            HWProc.send('TRIGGER_TEST');
+            const triggerTest = () => {
+                HWProc.send('TRIGGER_TEST');
+            }
+
+            setInterval(triggerTest, 1000);
 
             renderPage
                 ? res.render(renderPage, { "modules": moduleList })

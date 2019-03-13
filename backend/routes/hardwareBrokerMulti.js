@@ -762,7 +762,23 @@ function handleMessages (message) {
     //
 }
 
+const getRandomNumber = (min, max) => (
+  Math.random() * (max - min) + min
+);
 
+const constructTemp = () => {
+  const decimal = getRandomNumber(0, 9000) / 1000;
+  return 30 + Number(decimal.toFixed(3));
+};
+
+const constructOD = () => {
+  const decimal = getRandomNumber(20, 40) / 1000;
+  return 1 + Number(decimal.toFixed(3));
+};
+
+const constructSensorMessage = reactor => (
+  `${reactor},OD: ${constructOD()},temperature: ${constructTemp()}`
+);
 
 // Handle messages from the web server...
 process.on('message', (message) => {
@@ -773,7 +789,7 @@ process.on('message', (message) => {
     console.log("__");
 
     if (message === 'TRIGGER_TEST') {
-        const mockMessage = 'ZeePrime,OD: 3.984,Temperature: 33.437';
+        const mockMessage = constructSensorMessage('ZeePrime');
         triggerMockMessage(mockMessage);       
         return;
     };
