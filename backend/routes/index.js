@@ -640,7 +640,6 @@ HWProc.on('message', (message) => {
             //emitModuleUpdate(modState);
 
         } else if (cmd === 'CRX-LIMIT' && !IamCloud) {  // LIMIT CROSSOVER
-            initTestRootAssets();
             var mobj = message.message;
             var mid = mobj.module;
             var rid = mobj.id;
@@ -657,8 +656,10 @@ HWProc.on('message', (message) => {
                     // get the state that corrects the limit violation.
                     var setVal = modObj.limits[swtch][state];
 
+                    // console.log(modObj.moduleState);
                     // !! FOR SIMULATION PURPOSES !!
-                    modObj.moduleState[swtch] = !setVal;
+                    modObj.moduleState[swtch] = true;
+
                     //
                     // now look at the state as it is known in the model object
                     if (modObj.moduleState[swtch] !== undefined) {
@@ -694,6 +695,7 @@ HWProc.on('message', (message) => {
                             // or other source.  Let the hardwareBroker format the command
                             // --
                             // turn on or off the element defined by the limit report
+
                             // console.log('**Message to hardware broker**');
                             // console.log(msg);
                             HWProc.send(msg);   // BACK to process
@@ -704,8 +706,8 @@ HWProc.on('message', (message) => {
                             //  TO CLIENT WEB PAGE OR OTHER SERVER
                             var modState = {};
 
-                            // !! FOR SIMULATION PURPOSES !!
                             modState[rid] = reactionSet[rid];  // return just one
+
                             console.log()
                             print('** Message to Socket **')
                             console.log(rid)
@@ -832,7 +834,7 @@ global.loadRootAssets = (userId, renderPage, res) => {
             });
 
             // console.log('## gReactionsToUser');
-            // console.log(gReactionsToUser);
+            // print(gReactionsToUser);
 
             userRAssets.setUpdated("reactions")
             userRAssets.setEdited(false);
@@ -840,7 +842,6 @@ global.loadRootAssets = (userId, renderPage, res) => {
             // testState.assetsLoaded = true; 
             // print('%%%% test state updates')
             // console.log(testState);
-            HWProc.send('TRIGGER_TEST');
 
             renderPage
                 ? res.render(renderPage, { "modules": moduleList })
@@ -853,6 +854,10 @@ global.loadRootAssets = (userId, renderPage, res) => {
             : res.json(moduleList);
     }
 
+    if (renderPage === 'trigger!') {
+        print('&&& triggering &&&');
+        HWProc.send('TRIGGER_TEST');
+    }
 }
 
    router.get(g_Root, ensureAuthenticated, function (req, res) {
@@ -867,18 +872,19 @@ global.loadRootAssets = (userId, renderPage, res) => {
 });
 
 const initTestRootAssets = () => {
-    const testUserId = '5a4d2877e826b94a6da52b78';
+    //  newuser id
+    const testUserId = '5c4acda5cab072313a1f7ad5';
     const mockRes = {
         json () { },
         render () { },
     }
 
-    loadRootAssets(testUserId, null, mockRes);
+    loadRootAssets(testUserId, 'trigger!', mockRes);
 
 };
 
 // DEL
-initTestRootAssets();
+// initTestRootAssets();
 
 //
 router.get(gURL_allActiveReactions, ensureAuthenticated, function (req, res) {
@@ -1213,6 +1219,8 @@ function changeLimits (limits, limitSet) {
 // ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 router.post(gURL_updateState, (req, res) => {
+
+    initTestRootAssets();
     //
     var data = req.body;
     var mid = data.mid; // module id

@@ -273,7 +273,8 @@ const initTestPreambles = () => {
     gMCUPreambles = {
         ZeePrime:
         {
-            id: '5c2ecc2d87d0b75cbd3ed23d',
+            // spira-awesome reaction of newuser account
+            id: '5c6b66b88fd25d3cd9603399',
             cmd: 'query',
             module: 'ZeePrime'
         }
