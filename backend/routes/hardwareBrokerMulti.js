@@ -506,9 +506,6 @@ function messageToHardware (serverMessage) {
     /// 'from' identifies element first coming from the web page.
     var data = serverMessage.data;
 
-    console.log('\n\n', '**module from messageToHardware function**');
-    console.log(module, '\n\n');
-
     if (module) {                    ///  The def was there.
 
         var mcu = module.mcu;
@@ -714,8 +711,8 @@ function dequeueMessageOnACK (mid) {
         var message = gACKCmdQueue[mkey].shift();
         gACKReceived[mid] = false;
 
-        console.log('**Message in dequeueMessageOnACK**');
-        console.log(message);
+        // console.log('**Message in dequeueMessageOnACK**');
+        // console.log(message);
 
         if (isStateRequest(message)) {
             sendStateRequest(message);
@@ -767,9 +764,9 @@ function handleMessages (message) {
 process.on('message', (message) => {
     // setTimeout(tester,1000);
     //
-    console.log("messageToHardware")
-    console.dir(message, { depth: 4 });
-    console.log("__");
+    // console.log("messageToHardware")
+    // console.dir(message, { depth: 4 });
+    // console.log("__");
 
     if (message === 'TRIGGER_TEST') {
         mockCRXMessage();       

@@ -640,7 +640,6 @@ HWProc.on('message', (message) => {
             //emitModuleUpdate(modState);
 
         } else if (cmd === 'CRX-LIMIT' && !IamCloud) {  // LIMIT CROSSOVER
-
             initTestRootAssets();
             var mobj = message.message;
             var mid = mobj.module;
@@ -651,21 +650,23 @@ HWProc.on('message', (message) => {
             //
 
             var userRAssets = gReactionsToUser[rid];
-
-            print('userRAssets')
-            console.log(userRAssets);
-
+           
             var modObj = userRAssets.getModule(mid);
             if (modObj.limits !== undefined) {
                 if (modObj.limits[swtch] !== undefined) {
                     // get the state that corrects the limit violation.
                     var setVal = modObj.limits[swtch][state];
+
+                    // !! FOR SIMULATION PURPOSES !!
+                    modObj.moduleState[swtch] = !setVal;
                     //
                     // now look at the state as it is known in the model object
                     if (modObj.moduleState[swtch] !== undefined) {
+
                         // make changes if this is a change.
                         // -- it is possible to receive the limit command more than once for the same violation.
                         if (modObj.moduleState[swtch] !== setVal) {
+
                             // change the state
                             modObj.moduleState[swtch] = setVal;
                             // change the hardware, too.
@@ -677,11 +678,12 @@ HWProc.on('message', (message) => {
                                     "state": setVal
                                 }
                             }
+
                             //
                             if ((modObj.parameters !== undefined) && (modObj.parameters[swtch] !== undefined)) {
                                 var pars = modObj.parameters[swtch];
                                 for (var pkey in pars) {
-                                    msg.data[pkey] = pars[pars];
+                                    msg.data[pkey] = pars[pkey];
                                 }
                                 if (msg.data.stop !== undefined) {
                                     msg.data.start = msg.data.stop;
@@ -692,8 +694,8 @@ HWProc.on('message', (message) => {
                             // or other source.  Let the hardwareBroker format the command
                             // --
                             // turn on or off the element defined by the limit report
-                            console.log('**Message to hardware broker**');
-                            console.log(msg);
+                            // console.log('**Message to hardware broker**');
+                            // console.log(msg);
                             HWProc.send(msg);   // BACK to process
                             //
                             var reactionSet = userRAssets.activeReactions();
@@ -701,7 +703,14 @@ HWProc.on('message', (message) => {
                             //
                             //  TO CLIENT WEB PAGE OR OTHER SERVER
                             var modState = {};
+
+                            // !! FOR SIMULATION PURPOSES !!
                             modState[rid] = reactionSet[rid];  // return just one
+                            console.log()
+                            print('** Message to Socket **')
+                            console.log(rid)
+                            print(reactionSet)
+                            console.log()
                             emitModuleUpdate(modState);
                         }
                     }
@@ -711,7 +720,7 @@ HWProc.on('message', (message) => {
         } else {   // SEND SENSOR DATA
             //
             //console.log(message)
-            //   HWProc.dataEvents.emit('datum', message);
+              HWProc.dataEvents.emit('datum', message);
             var storeData = message.message;
             if (storeData && storeData.OD && storeData.Temperature && storeData.id && !IamCloud) {
                 if (!(isNaN(storeData.OD) || isNaN(storeData.Temperature))) {
@@ -858,7 +867,6 @@ global.loadRootAssets = (userId, renderPage, res) => {
 });
 
 const initTestRootAssets = () => {
-    print('!! Test Init Func')
     const testUserId = '5a4d2877e826b94a6da52b78';
     const mockRes = {
         json () { },
