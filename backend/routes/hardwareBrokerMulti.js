@@ -286,7 +286,7 @@ const initTestPreambles = () => {
 const mockCRXMessage = () => {
     print('!!!CRX Gen')
     initTestPreambles();
-    const CRXMessage = 'CRXZeePrime,LIMIT: temperature,LEVEL: HIGH';
+    const CRXMessage = 'CRXZeePrime,LIMIT: temperature,LEVEL: LOW';
     lineParserHandler(CRXMessage);
 }
 

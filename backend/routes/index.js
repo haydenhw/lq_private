@@ -658,7 +658,7 @@ HWProc.on('message', (message) => {
 
                     // console.log(modObj.moduleState);
                     // !! FOR SIMULATION PURPOSES !!
-                    modObj.moduleState[swtch] = true;
+                    modObj.moduleState[swtch] = false;
 
                     //
                     // now look at the state as it is known in the model object

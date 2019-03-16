@@ -203,7 +203,7 @@ dataIo.on('datum', (datum) => {
 
 
 dataIo.on('module',(modStates) => {
-    console.log(modStates);
+    console.log(JSON.stringify(modStates,null,2));
               updateReactions(modStates,true);
           });
 
