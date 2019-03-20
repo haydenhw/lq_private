@@ -572,179 +572,179 @@ var gACK_queue = []
 
 // Receive message to be forwarded to socket.io clients.
 HWProc.on('message', (message) => {
-    if (message.message) {
-        //ignore ack's
-        if (message.message === "ACK") {
-            while (gACK_queue.length) {
-                var ackAction = gACK_queue.shift();
-                ackAction();
-            }
+              if ( message.message ) {
+                  //ignore ack's
+                  if ( message.message === "ACK" ) {
+                      while ( gACK_queue.length ) {
+                          var ackAction = gACK_queue.shift();
+                          ackAction();
+                      }
 
-            return;
-        }
-        var cmd = message.message.cmd;
-        if (cmd === gHWCmd_query) {  // STATE REPORT COMMAND  // SOO == SENSOR ON OFF
+                      return;
+                  }
+                  var cmd = message.message.cmd;
+                  if ( cmd === gHWCmd_query ) {  // STATE REPORT COMMAND  // SOO == SENSOR ON OFF
 
-            return;  // PROBLEMS BEYOND BELIEF
-            //
-            var mobj = message.message;
+                      return;  // PROBLEMS BEYOND BELIEF
+                      //
+                      var mobj = message.message;
 
-            if (!IamCloud) {
-                forwardHardwareMessage(mobj)
-            }
+                      if ( !IamCloud ) {
+                          forwardHardwareMessage(mobj)
+                      }
 
-            var mid = mobj.module;
-            var rid = mobj.id;
-            //
-            var userRAssets = gReactionsToUser[rid];
+                      var mid = mobj.module;
+                      var rid = mobj.id;
+                      //
+                      var userRAssets = gReactionsToUser[rid];
 
-            var modObj = userRAssets.getModule(mid);
-            //
-            // Special case for now - update the module description
-            //
-            if (mobj.SOO !== undefined) {
-                modObj.moduleState.SensorOnOff = (mobj.SOO !== 0) ? true : false;
-                modObj.parameters.SensorOnOff.ctrlValue = mobj['SOO-ctrlValue'];
-            }
-            if (mobj.PumpDir !== undefined && mobj.PumpRate !== undefined) {
-                // other actual parameters need one more parameter for the four pumps
-                var dir = mobj.PumpDir;
-                var rate = mobj.PumpRate;
-                if (rate == 0) {
-                    // then the motor is not running for anyone
-                    modObj.moduleState.water = false;
-                    modObj.moduleState.inoculum = false;
-                    modObj.moduleState.mixer = false;
-                    modObj.moduleState.extraction = false;
-                }
-            }
-            if (mobj.Lamp !== undefined) {
-                modObj.moduleState.Lamp = mobj.Lamp;
-                modObj.parameters.Lamp.level = mobj['Lamp-level'];
-            }
-            if (mobj.Heater !== undefined) {
-                modObj.moduleState.Heater = mobj.Heater;
-                modObj.parameters.Heater.level = mobj['Heater-level'];
-            }
-            if (mobj.Air !== undefined) {
-                modObj.moduleState.Air = mobj.Air;
-            }
-            //
-            // Generic starts again
-            //
-            var reactionSet = userRAssets.activeReactions();
-            var modState = {};
-            modState[rid] = reactionSet[rid];  // return just one
-            //
-            //
-            //emitModuleUpdate(modState);
+                      var modObj = userRAssets.getModule(mid);
+                      //
+                      // Special case for now - update the module description
+                      //
+                      if ( mobj.SOO !== undefined ) {
+                          modObj.moduleState.SensorOnOff = ( mobj.SOO !== 0 ) ? true : false;
+                          modObj.parameters.SensorOnOff.ctrlValue = mobj['SOO-ctrlValue'];
+                      }
+                      if ( mobj.PumpDir !== undefined  && mobj.PumpRate !== undefined  ) {
+                          // other actual parameters need one more parameter for the four pumps
+                          var dir = mobj.PumpDir;
+                          var rate = mobj.PumpRate;
+                          if ( rate == 0 ) {
+                              // then the motor is not running for anyone
+                              modObj.moduleState.water = false;
+                              modObj.moduleState.inoculum = false;
+                              modObj.moduleState.mixer = false;
+                              modObj.moduleState.extraction = false;
+                          }
+                      }
+                      if ( mobj.Lamp !== undefined ) {
+                          modObj.moduleState.Lamp = mobj.Lamp;
+                          modObj.parameters.Lamp.level = mobj['Lamp-level'];
+                      }
+                      if ( mobj.Heater !== undefined  ) {
+                          modObj.moduleState.Heater = mobj.Heater;
+                          modObj.parameters.Heater.level = mobj['Heater-level'];
+                      }
+                      if ( mobj.Air !== undefined  ) {
+                          modObj.moduleState.Air = mobj.Air;
+                      }
+                      //
+                      // Generic starts again
+                      //
+                      var reactionSet = userRAssets.activeReactions();
+                      var modState = {};
+                      modState[rid] = reactionSet[rid];  // return just one
+                      //
+                      //
+                      //emitModuleUpdate(modState);
 
-        } else if (cmd === 'CRX-LIMIT' && !IamCloud) {  // LIMIT CROSSOVER
-            var mobj = message.message;
-            var mid = mobj.module;
-            var rid = mobj.id;
+                  } else if ( cmd === 'CRX-LIMIT' && !IamCloud ) {  // LIMIT CROSSOVER
+                      var mobj = message.message;
+                      var mid = mobj.module;
+                      var rid = mobj.id;
 
-            var state = mobj.LEVEL;
-            var swtch = mobj.LIMIT;
-            //
+                      var state = mobj.LEVEL;
+                      var swtch = mobj.LIMIT;
+                      //
+                      var userRAssets = gReactionsToUser[rid];
+                      var modObj = userRAssets.getModule(mid);
+                      if ( modObj.limits !== undefined ) {
+                          if ( modObj.limits[swtch] !== undefined ) {
+                              // get the state that corrects the limit violation.
+                              var setVal = modObj.limits[swtch][state];
+                              //
+                              // now look at the state as it is known in the model object
+                              if ( modObj.moduleState[swtch] !== undefined ) {
+                                  // make changes if this is a change.
+                                  // -- it is possible to receive the limit command more than once for the same violation.
+                                  if ( modObj.moduleState[swtch] !== setVal ) {
+                                      // change the state
+                                      modObj.moduleState[swtch] = setVal;
+                                      // change the hardware, too.
+                                      var msg = {
+                                          "dest": mid,
+                                          "id": rid,
+                                          data: {
+                                              "switch": swtch,
+                                              "state": setVal
+                                          }
+                                      }
+                                      //
+                                      if ( (modObj.parameters !== undefined) && (modObj.parameters[swtch] !== undefined) ) {
+                                          var pars = modObj.parameters[swtch];
+                                          for ( var pkey in pars ) {
+                                              msg.data[pkey] = pars[pkey];
+                                          }
+                                          if ( msg.data.stop !== undefined ) {
+                                              msg.data.start = msg.data.stop;
+                                          }
+                                      }
+                                      //
+                                      // send a message just like one that comes from the UI
+                                      // or other source.  Let the hardwareBroker format the command
+                                      // --
+                                      // turn on or off the element defined by the limit report
+                                      HWProc.send(msg);   // BACK to process
+                                      //
+                                      var reactionSet = userRAssets.activeReactions();
+                                      var modState = reactionSet[rid];
+                                      //
+                                      //  TO CLIENT WEB PAGE OR OTHER SERVER
+                                      var modState = {};
+                                      modState[rid] = reactionSet[rid];  // return just one
+                                      emitModuleUpdate(modState);
+                                  }
+                              }
+                          }
+                      }
 
-            var userRAssets = gReactionsToUser[rid];
-           
-            var modObj = userRAssets.getModule(mid);
-            if (modObj.limits !== undefined) {
-                if (modObj.limits[swtch] !== undefined) {
-                    // get the state that corrects the limit violation.
-                    var setVal = modObj.limits[swtch][state];
+                  } else {   // SEND SENSOR DATA
+                      //
 
-                    // console.log(modObj.moduleState);
-                    // !! FOR SIMULATION PURPOSES !!
-                    modObj.moduleState[swtch] = false;
+                      //console.log(message)
+                      HWProc.dataEvents.emit('datum', message);
+                      var storeData = message.message;
+                      if ( storeData && (storeData.OD != undefined)  && (storeData.Temperature != undefined) && storeData.id ) {
+                          if ( !(isNaN(storeData.OD) || isNaN(storeData.Temperature)) ) {
+                              //
+                              // Redis
+                              writeMeasurementPoint(storeData.OD,storeData.Temperature,storeData.id)
+                              //
+                              if ( !IamCloud ) {
+                                  // Influx
+                                  // sensor output ...  really want to cache these and send a batch...
+                                  // write to local file and then batch from the file...
+                                  // influxWriteSensorDatum(reactionId,module,OD,Temp,ts)
+                                  influxWriteSensorDatum(storeData.id,storeData.mid,storeData.OD,storeData.Temperature)
+                              }
+                          }
+                      }
 
-                    //
-                    // now look at the state as it is known in the model object
-                    if (modObj.moduleState[swtch] !== undefined) {
+                      // HWProc.dataEvents.emit('datum', message);
+                      //
+                      // var storeData = message.message;
+                      // if ( storeData && storeData.OD && storeData.Temperature && storeData.id && !IamCloud ) {
+                      //     if ( !(isNaN(storeData.OD) || isNaN(storeData.Temperature)) ) {
+                      //         //
+                      //         // Redis
+                      //         writeMeasurementPoint(storeData.OD,storeData.Temperature,storeData.id)
+                      //         //
+                      //         // Influx
+                      //         // sensor output ...  really want to cache these and send a batch...
+                      //         // write to local file and then batch from the file...
+                      //         // influxWriteSensorDatum(reactionId,module,OD,Temp,ts)
+                      //         influxWriteSensorDatum(storeData.id,storeData.mid,storeData.OD,storeData.Temperature)
+                      //     }
+                      // }
 
-                        // make changes if this is a change.
-                        // -- it is possible to receive the limit command more than once for the same violation.
-                        if (modObj.moduleState[swtch] !== setVal) {
+                      if ( !IamCloud ) {
+                          forwardHardwareMessage(message.message);
+                      }
 
-                            // change the state
-                            modObj.moduleState[swtch] = setVal;
-                            // change the hardware, too.
-                            var msg = {
-                                "dest": mid,
-                                "id": rid,
-                                data: {
-                                    "switch": swtch,
-                                    "state": setVal
-                                }
-                            }
-
-                            //
-                            if ((modObj.parameters !== undefined) && (modObj.parameters[swtch] !== undefined)) {
-                                var pars = modObj.parameters[swtch];
-                                for (var pkey in pars) {
-                                    msg.data[pkey] = pars[pkey];
-                                }
-                                if (msg.data.stop !== undefined) {
-                                    msg.data.start = msg.data.stop;
-                                }
-                            }
-                            //
-                            // send a message just like one that comes from the UI
-                            // or other source.  Let the hardwareBroker format the command
-                            // --
-                            // turn on or off the element defined by the limit report
-
-                            // console.log('**Message to hardware broker**');
-                            // console.log(msg);
-                            HWProc.send(msg);   // BACK to process
-                            //
-                            var reactionSet = userRAssets.activeReactions();
-                            var modState = reactionSet[rid];
-                            //
-                            //  TO CLIENT WEB PAGE OR OTHER SERVER
-                            var modState = {};
-
-                            modState[rid] = reactionSet[rid];  // return just one
-
-                            console.log()
-                            print('** Message to Socket **')
-                            console.log(rid)
-                            print(reactionSet)
-                            console.log()
-                            emitModuleUpdate(modState);
-                        }
-                    }
-                }
-            }
-
-        } else {   // SEND SENSOR DATA
-            //
-            //console.log(message)
-              HWProc.dataEvents.emit('datum', message);
-            var storeData = message.message;
-            if (storeData && storeData.OD && storeData.Temperature && storeData.id && !IamCloud) {
-                if (!(isNaN(storeData.OD) || isNaN(storeData.Temperature))) {
-                    //
-                    // Redis
-                    writeMeasurementPoint(storeData.OD, storeData.Temperature, storeData.id)
-                    //
-                    // Influx
-                    // sensor output ...  really want to cache these and send a batch...
-                    // write to local file and then batch from the file...
-                    // influxWriteSensorDatum(reactionId,module,OD,Temp,ts)
-                    influxWriteSensorDatum(storeData.id, storeData.mid, storeData.OD, storeData.Temperature)
-                }
-            }
-
-            if (!IamCloud) {
-                forwardHardwareMessage(message.message);
-            }
-
-        }
-    }
-})
+                  }
+              }
+          })
 
 
 router.setSocketIo = (io) => {

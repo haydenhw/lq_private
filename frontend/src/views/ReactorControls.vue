@@ -24,8 +24,13 @@
               icon-name="icon-heat"
               :handle-click="SET_HEATER_ACTIVE"
             />
+            <BaseSidebarItem
+              title="Pump"
+              icon-name="icon-pump"
+              :handle-click="SET_PUMP_ACTIVE"
+            />
           </div>
-          <div class="rc-sidebar-heading sensor-header">
+          <div class="rc-sidebar-heading">
             Sensors
           </div>
           <v-divider />
@@ -63,16 +68,17 @@ import {
   SET_AIR_ACTIVE,
   SET_HEATER_ACTIVE,
   SET_LIGHT_ACTIVE,
+  SET_PUMP_ACTIVE,
 } from '@/store/mutations.types';
 
 import BaseHeader from '@/components/BaseHeader';
 import BaseNav from '@/components/BaseNav';
 import BaseSidebar from '@/components/BaseSidebar';
 import BaseSidebarItem from '@/components/BaseSidebarItem';
-import LightControlPanel from '@/components/LightControlPanel';
-import HeaterControlPanel from '@/components/HeaterControlPanel';
 import AirControlPanel from '@/components/AirControlPanel';
-
+import HeaterControlPanel from '@/components/HeaterControlPanel';
+import LightControlPanel from '@/components/LightControlPanel';
+import PumpControlPanel from '@/components/PumpControlPanel';
 
 export default {
   components: {
@@ -80,9 +86,10 @@ export default {
     BaseNav,
     BaseSidebar,
     BaseSidebarItem,
+    AirControlPanel,
     HeaterControlPanel,
     LightControlPanel,
-    AirControlPanel,
+    PumpControlPanel,
   },
   computed: {
     // TODO: use map state for these
@@ -98,7 +105,12 @@ export default {
     },
   },
   methods: {
-    ...mapMutations([SET_AIR_ACTIVE, SET_HEATER_ACTIVE, SET_LIGHT_ACTIVE]),
+    ...mapMutations([
+      SET_AIR_ACTIVE,
+      SET_HEATER_ACTIVE,
+      SET_LIGHT_ACTIVE,
+      SET_PUMP_ACTIVE,
+    ]),
     routeHome() {
       this.$router.push('/');
     },
@@ -146,10 +158,6 @@ export default {
   padding: 0.5em 0.7em;
 }
 
-.sensor-header {
-  margin-top: 1em;
-}
-
 .rc-sensor-item {
   display: flex;
   font-size: 18.2px;
@@ -159,11 +167,6 @@ export default {
 
 .rc-sensor-label {
   width: 66%;
-  // margin-left: auto;
-}
-
-.rc-sensor-val {
-  // margin-left: auto;
 }
 
 .rc-controls {

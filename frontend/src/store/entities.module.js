@@ -151,8 +151,6 @@ export const actions = {
 };
 
 // Getters
-
-
 export const getActiveReactionId = alert => (state) => {
   const [activeReaction] = Object.keys(state.reactions).filter(
     reactionId => state.reactions[reactionId].active,
@@ -168,6 +166,14 @@ export const getActiveReactionId = alert => (state) => {
   return activeReaction;
 };
 
+const getParamsKey = (selectedModuleName, actuatorName) => (
+  `${selectedModuleName}-${actuatorName}-parameters`
+);
+
+const getLimitsKey = (selectedModuleName, actuatorName) => (
+  `${selectedModuleName}-${actuatorName}-limits`
+);
+
 export const getApiUpdatePayload = actuatorName => (
   state,
   {
@@ -178,23 +184,39 @@ export const getApiUpdatePayload = actuatorName => (
     activeModuleLimits,
   },
 ) => {
-  const paramsKey = `${selectedModuleName}-${actuatorName}-parameters`;
-  const limitsKey = `${selectedModuleName}-${actuatorName}-limits`;
+  // TODO refactor to create these keys with the same function
+  const paramsKey = getParamsKey(selectedModuleName, actuatorName);
+  const limitsKey = getLimitsKey(selectedModuleName, actuatorName);
 
+  const targetParams = activeModuleParams[actuatorName];
   const targetLimits = activeModuleLimits[actuatorName];
+
+  // TODO move this logic to a separate function
   const limits = targetLimits
     ? { 'HIGH-value': targetLimits['HIGH-value'], 'LOW-value': targetLimits['LOW-value'] }
     : {};
 
-  return {
+  let apiPayload = {
     mid: selectedModuleName,
     allStates: activeModuleState,
     activeId: activeReactionId,
     activeSwitch: `ReactionActive-${activeReactionId}`,
     changes: [actuatorName],
-    [paramsKey]: activeModuleParams[actuatorName],
+    [paramsKey]: targetParams,
     [limitsKey]: limits || {},
   };
+
+  // TODO move this logic to a separate function
+  // TODO refactor so that both extraction and water props aren't included in the same request
+  if (actuatorName === 'water' || actuatorName === 'extraction') {
+    const specialParams = {
+      [paramsKey]: Object.assign({}, { 'material-rate': '0', 'material-amount': '0', level: '100' }),
+    };
+
+    apiPayload = Object.assign({}, apiPayload, specialParams);
+  }
+
+  return apiPayload;
 };
 
 const getHeater = (state, { activeModuleState, activeModuleParams, activeModuleLimits }) => ({
@@ -230,11 +252,15 @@ export const getters = {
   activeModuleState: (state, { activeModule }) => activeModule.moduleState,
   activeModuleLimits: (state, { activeModule }) => activeModule.limits,
   air: (state, { activeModuleState }) => activeModuleState.Air,
+  water: (state, { activeModuleState }) => activeModuleState.water,
+  extraction: (state, { activeModuleState }) => activeModuleState.extraction,
   heater: getHeater,
   lamp: getLamp,
   airUpdatePayload: getApiUpdatePayload('Air'),
   lampUpdatePayload: getApiUpdatePayload('Lamp'),
   heaterUpdatePayload: getApiUpdatePayload('Heater'),
+  waterUpdatePayload: getApiUpdatePayload('water'),
+  extractionUpdatePayload: getApiUpdatePayload('extraction'),
 };
 
 export default {
