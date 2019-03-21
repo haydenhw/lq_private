@@ -4,6 +4,7 @@ const testState = require('./testState');
 // require test state
 
 var fs = require('fs');
+var logger = require('../utility/logger');
 const print = require('../utility/print');
 
 function clonify (obj) {
@@ -329,12 +330,19 @@ function lineParserHandler (str) {
         // handle sensor cross over response.
         var messageBackToServer = str.substr(3); // use the rest of it
 
+        logger.debug('** CRX Message Detected **');
+        logger.debug(messageBackToServer);
+
         //
         var srvMsg = constructServerMessage(messageBackToServer, "CRX-LIMIT");
         console.log()
         console.log('**SrvMsg**');
         console.log(srvMsg);
         console.log()
+
+        logger.debug('** SrvMsg **')
+        logger.debug(srvMsg)
+
         if (srvMsg && process.send) {
             if (srvMsg.message.LIMIT === "temperature") srvMsg.message.LIMIT = "Heater";
             process.send(srvMsg);
