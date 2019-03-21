@@ -283,10 +283,19 @@ const initTestPreambles = () => {
 
 //
 
+let messageType = 'LOW';
+
 const mockCRXMessage = () => {
     print('!!!CRX Gen')
+    console.log({ messageType });
     initTestPreambles();
-    const CRXMessage = 'CRXZeePrime,LIMIT: temperature,LEVEL: LOW';
+
+    const CRXMessage = messageType === 'LOW' 
+      ? 'CRXZeePrime,LIMIT: temperature,LEVEL: LOW'
+      : 'CRXZeePrime,LIMIT: temperature,LEVEL: HIGH';
+
+    messageType = messageType === 'LOW' ? 'HIGH' : 'LOW';
+
     lineParserHandler(CRXMessage);
 }
 

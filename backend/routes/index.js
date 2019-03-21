@@ -1,3 +1,4 @@
+
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
@@ -31,8 +32,25 @@ const g_Root = '/';
 const gHWCmd_query = 'query';
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+let started = false;
+const startCycle = () => {
+    const timeout = 10000;
+        const trigger = () => {
+            console.log()
+            console.log()
+            print('&&& triggering &&&');
+            console.count();
+            console.log()
+            console.log()
+            HWProc.send('TRIGGER_TEST');
+        }
 
+    if (started === false) {
+      setInterval(trigger, timeout);
+    }
 
+    started = true;
+} 
 // module events go straight to Influx...
 //
 
@@ -640,12 +658,16 @@ HWProc.on('message', (message) => {
                       //emitModuleUpdate(modState);
 
                   } else if ( cmd === 'CRX-LIMIT' && !IamCloud ) {  // LIMIT CROSSOVER
+
+
                       var mobj = message.message;
                       var mid = mobj.module;
                       var rid = mobj.id;
 
+
                       var state = mobj.LEVEL;
                       var swtch = mobj.LIMIT;
+
                       //
                       var userRAssets = gReactionsToUser[rid];
                       var modObj = userRAssets.getModule(mid);
@@ -654,6 +676,19 @@ HWProc.on('message', (message) => {
                               // get the state that corrects the limit violation.
                               var setVal = modObj.limits[swtch][state];
                               //
+
+
+
+
+                              // ** FOR SIUMLATION PURPOSES ONLY **
+                            //    setVal = !modObj.moduleState[swtch];
+
+
+                           print('** modObj From Index Limit Handler**');
+                        //    console.log('switch', swtch);
+                           print({ Heater: modObj.moduleState.Heater });
+                        //    console.log('setval', setVal)
+
                               // now look at the state as it is known in the model object
                               if ( modObj.moduleState[swtch] !== undefined ) {
                                   // make changes if this is a change.
@@ -693,6 +728,17 @@ HWProc.on('message', (message) => {
                                       //  TO CLIENT WEB PAGE OR OTHER SERVER
                                       var modState = {};
                                       modState[rid] = reactionSet[rid];  // return just one
+                                    //   console.log()
+                                    //   console.log()
+                                    //   console.log()
+                                    //   print('** Emitting Mod State **')
+                                    //   console.log()
+                                    //   console.log()
+                                    //   console.log()
+                                    //   print(modState);
+
+
+
                                       emitModuleUpdate(modState);
                                   }
                               }
@@ -702,7 +748,7 @@ HWProc.on('message', (message) => {
                   } else {   // SEND SENSOR DATA
                       //
 
-                      //console.log(message)
+                      console.log(message)
                       HWProc.dataEvents.emit('datum', message);
                       var storeData = message.message;
                       if ( storeData && (storeData.OD != undefined)  && (storeData.Temperature != undefined) && storeData.id ) {
@@ -839,10 +885,6 @@ global.loadRootAssets = (userId, renderPage, res) => {
             userRAssets.setUpdated("reactions")
             userRAssets.setEdited(false);
 
-            // testState.assetsLoaded = true; 
-            // print('%%%% test state updates')
-            // console.log(testState);
-
             renderPage
                 ? res.render(renderPage, { "modules": moduleList })
                 : res.json(moduleList);
@@ -854,10 +896,7 @@ global.loadRootAssets = (userId, renderPage, res) => {
             : res.json(moduleList);
     }
 
-    if (renderPage === 'trigger!') {
-        print('&&& triggering &&&');
-        HWProc.send('TRIGGER_TEST');
-    }
+   startCycle();
 }
 
    router.get(g_Root, ensureAuthenticated, function (req, res) {
@@ -874,14 +913,14 @@ global.loadRootAssets = (userId, renderPage, res) => {
 const initTestRootAssets = () => {
     //  newuser id
     const testUserId = '5c4acda5cab072313a1f7ad5';
-    const mockRes = {
-        json () { },
-        render () { },
-    }
+    const mockRes = { json () {}, render () {} };
 
     loadRootAssets(testUserId, 'trigger!', mockRes);
-
 };
+
+const triggerUpdate = () => {
+  
+}
 
 // DEL
 // initTestRootAssets();
@@ -1219,8 +1258,6 @@ function changeLimits (limits, limitSet) {
 // ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 router.post(gURL_updateState, (req, res) => {
-
-    initTestRootAssets();
     //
     var data = req.body;
     var mid = data.mid; // module id
