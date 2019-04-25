@@ -1,29 +1,46 @@
 <template>
   <div
     class="header"
-    @click="handleIconClick"
   >
     <span
       v-if="backIcon"
       v-ripple
       class="icon-back"
+      @click="handleIconClick"
     />
     <img
       class="header-logo"
       src="@/assets/logo-small.png"
       alt="company logo"
+      @click="handleIconClick"
     >
-    <!-- <BaseSidebarUserMenu class="header-user-menu" /> -->
+    <BaseDropdown class="header-dropdown">
+      <a
+        v-ripple
+        href="#"
+        @click="sayHi"
+      >Link 1</a>
+      <a
+        v-ripple
+        href="#"
+        @click="sayHi"
+      >Link 2</a>
+      <a
+        v-ripple
+        href="#"
+        @click="sayHi"
+      >Link 3</a>
+    </BaseDropdown>
   </div>
 </template>
 
 <script>
-import BaseSidebarUserMenu from '@/components/BaseSidebarUserMenu';
+import BaseDropdown from '@/components/BaseDropdown';
 
 export default {
   name: 'BaseHeader',
   components: {
-    BaseSidebarUserMenu,
+    BaseDropdown,
   },
   props: {
     title: {
@@ -39,12 +56,16 @@ export default {
       default: () => { },
     },
   },
+  methods: {
+    sayHi() {
+      console.log('doing!');
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 @import '../styles/variables';
-
 .header {
   align-items: center;
   padding: 0.3em ($left-boundary-padding - 10) * 1px;
@@ -52,6 +73,7 @@ export default {
   color: white;
   font-size: 3.4em;
 }
+
 
 .icon-back {
   border-radius: 50%;
@@ -64,7 +86,8 @@ export default {
   width: 2.2em;
 }
 
-.header-user-menu {
+.header-dropdown {
+  font-size: .5em;
   margin-left: auto;
 }
 </style>

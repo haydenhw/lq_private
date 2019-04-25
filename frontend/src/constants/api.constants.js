@@ -9,6 +9,7 @@ const DEV_BASE_URL = `http://${window.location.hostname}:${SERVER_PORT}`;
 
 // SOCKET URLS
 export const SENSOR_DATA_SOCKET_URL = `${PI_BASE_URL}/data`;
+console.log(SENSOR_DATA_SOCKET_URL);
 export const DIM_LAMP_SOCKET_URL = IS_SERVER_RUNNING_ON_PI
   ? `${PI_BASE_URL}/dimLamp`
   : `${DEV_BASE_URL}/dimLamp`;
