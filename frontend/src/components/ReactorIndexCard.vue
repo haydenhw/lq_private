@@ -3,7 +3,10 @@
     class="reactor-card"
     :class="`reactor-card-${reactorTitle}`"
   >
-    <div @click="onClick">
+    <div
+      role="button"
+      @click="onClick"
+    >
       <div
         class="reactor-card-data"
       >

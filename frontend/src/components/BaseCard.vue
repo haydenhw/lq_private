@@ -1,5 +1,8 @@
 <template>
-  <div class="card">
+  <div
+    class="card"
+    role="button"
+  >
     <slot />
   </div>
 </template>
