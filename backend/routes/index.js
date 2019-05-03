@@ -1,16 +1,15 @@
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
-const influx = require('influx');
-
-
+var influx = require('influx');
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 var Reaction = require('../models/reaction');
 var Measurements = require('../models/measurements');
-var Modules = require('../models/modules');
 
+var restorePrevState = require('../utility/restorePrevState');
+var { saveModuleStateToReaction } = require('../utility/databaseUtils');
 var logger = require('../utility/logger');
 var print = require('../utility/print');
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -497,7 +496,8 @@ function writeAllMeasurementsToInfluxFromMongo() {
 // -----------------------------------------------------------------------
 
 
-function mongoPersistActiveState(id,data,isActive) {
+function mongoPersistActiveState(id, data, isActive) {
+    console.log('frim mongoPersistActiveState')
     Reaction.find({'_id': id}, 'active',  (err, reactions) => {  // by id and return Datalog array, etc.
                       if(err) return handleError(err);
                       //
@@ -510,7 +510,7 @@ function mongoPersistActiveState(id,data,isActive) {
                               //
                               Reaction.findByIdAndUpdate(
                                   { '_id' : id },
-                                  { ModuleState : data, active : isActive },
+                                  { ModuleState : data, active : isActive, test: "hello" },
                                   function (err) {
                                       if(err) return handleError(err);
                                   });
@@ -847,32 +847,40 @@ function handleError(err) {
     return(err)
 }
 
-global.loadRootAssets = (userId,renderPage,res) => {
+
+global.loadRootAssets = async (userId, renderPage, res) => {
     //
     //
     if ( gUserAssets[userId] == undefined ) {
-        gUserAssets[userId] = new UserReactionsAssets(userId,dosisMods);
+        gUserAssets[userId] = new UserReactionsAssets(userId, dosisMods);
     }
 
     var userRAssets = gUserAssets[userId];
-    var moduleList = userRAssets.genModuleList()
+    await restorePrevState(userId, userRAssets);
+    var moduleList = userRAssets.genModuleList();
     //
 
-    if ( userRAssets.needsUpdate("reactions") ) {
+    if (true || userRAssets.needsUpdate("reactions") ) {
 
         var reactionFields = [ 'id', 'name', 'module', 'media', 'procedure', 'notes', 'ModuleState', 'active' ]
-
+        // 
         Reaction.find({ 'user.id': userId }, reactionFields.join(' '), (err, reactions) => {
             //
             if(err) return handleError(err);
             //
             reactions.forEach((reaction) => {
-                                  userRAssets.updateReaction(reaction,reactionFields);
+                                  userRAssets.updateReaction(reaction, reactionFields);
                                   gReactionsToUser[reaction.id] = userRAssets;
                           });
 
+
             userRAssets.setUpdated("reactions")
             userRAssets.setEdited(false);
+
+            // moduleList.forEach(mod => {
+            //     console.log(mod.mod_name);
+            //     console.log()
+            // });
 
             renderPage
               ? res.render(renderPage, { "modules" : moduleList })
@@ -887,6 +895,7 @@ global.loadRootAssets = (userId,renderPage,res) => {
 
 }
 
+loadRootAssets('5cae6359108c4a19d00eb39d', null, { render(a,b){}, json(a,b){} });
 
 //======  ======  ======   ======   ======   ======   ======   ======   ======   ======   ======   ======   ======
 
@@ -1102,6 +1111,8 @@ router.post(gURL_add, function(req, res){
                                  notes: req.body.notes,
                                  user: {id: req.user._id, name: req.user.username},
                                  ModuleState : iniModuleState,
+                                //  ModuleState : {...iniModuleState, settings: {} },
+                                //  ModuleState : {},
                                  active : false
                                });
                                //
@@ -1240,10 +1251,11 @@ router.post(gURL_updateState, ensureAuthenticated, (req,res) => {
                 var data = req.body;
                 var mid = data.mid; // module id
                 var id = data.activeId;
+                var modObj;
 
                 var userRAssets = gReactionsToUser[id];
                 if ( userRAssets !== undefined ) {
-                    var modObj = userRAssets.getModule(mid);
+                    modObj = userRAssets.getModule(mid);
                     if ( modObj ) {
                         //
                         var moduleStates = modObj.moduleState;
@@ -1271,6 +1283,18 @@ router.post(gURL_updateState, ensureAuthenticated, (req,res) => {
                                     }
                                 }
                             }
+
+            const ids = Object.keys(gReactionsToUser);
+            const dummy = ids.map(id => {
+              const modules = Object.keys(gReactionsToUser[id].allModulesActive);
+              modules.forEach(module => {
+                console.log(id);
+                console.log(module);
+                console.log(gReactionsToUser[id].allModulesActive[module].moduleState)
+                // print(gReactionsToUser[id].allModulesActive)
+              });
+              return gReactionsToUser[id].allModulesActive;
+            });                            
 
                             //
                             forwardToHardware(changeSet,mid,moduleStates,data);  // data contains the carries if any..
@@ -1319,8 +1343,8 @@ router.post(gURL_updateState, ensureAuthenticated, (req,res) => {
 
                 }
 
-                res.send({})
-
+                saveModuleStateToReaction(id, modObj);
+                res.send({});
             });
 
 

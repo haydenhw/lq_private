@@ -38,6 +38,7 @@ var ReactionSchema = mongoose.Schema({
   }],
 
   ModuleState : { type :mongoose.Schema.Types.Mixed },
+  // ModuleState : {},
 
   active : {
     type: Boolean,

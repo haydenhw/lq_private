@@ -74,6 +74,7 @@ module.exports = class UserReactionsAssets {
             var modName = mname;
             //
             var mm = this.allModulesActive[modName];
+            
             if ( mm == undefined ) {
                 continue;
             }
@@ -144,23 +145,37 @@ module.exports = class UserReactionsAssets {
         this.edited = state;
     }
 
+    setAllModulesActive(activeModuleArray) {
+        this.allModulesActive = activeModuleArray;
+    }
+
     setUpdated(dataSetId) {
         this._needsUpdate[dataSetId] = false;
+    }
+
+    setUpdateNeeded(dataSetId) {
+        this._needsUpdate[dataSetId] = true;
     }
 
     updateReaction(reactObj,fields) {
         //
         var usersReaction = this.reactions[reactObj.id];
         var module = this.allModulesActive[reactObj.module];
+        var moduleReactionIds = module.reactions.map(reaction => reaction.id);
         //
         if ( module ) {
             //
             if ( usersReaction == undefined ) {
                 usersReaction = {};
                 this.reactions[reactObj.id] = usersReaction;
-                module.reactions.push(usersReaction);
             }
             //
+
+            if (!moduleReactionIds.includes(reactObj.id)) {
+                module.reactions.push(usersReaction);
+            }
+
+
             fields.forEach(field => {
                                usersReaction[field] = reactObj[field];
                            })

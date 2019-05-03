@@ -65,6 +65,7 @@ global.subst = (a,b,c) => {
 }
 
 global.ensureAuthenticated = (req, res, next) => {
+
     if ( req.isAuthenticated() ) {
       return next();
     } else if (req.get('client') === 'vue-client') {
@@ -94,7 +95,9 @@ if ( !IamCloud ) {
                       });
         gHModuleWS.on('message', (data) => {});
         gHModuleWS.on('error',(e) => {
-                          console.log(e)
+                          if (!process.env.OFFSITE_DEV) {
+                            console.log(e)
+                          }
                       })
     } catch (e) {
         console.log("no ws connection")

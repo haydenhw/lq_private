@@ -6,12 +6,14 @@
       v-if="backIcon"
       v-ripple
       class="icon-back"
+      role="button"
       @click="handleIconClick"
     />
     <img
       class="header-logo"
       src="@/assets/logo-small.png"
       alt="company logo"
+      role="button"
       @click="handleIconClick"
     >
     <BaseDropdown class="header-dropdown">

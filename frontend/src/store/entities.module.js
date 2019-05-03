@@ -114,9 +114,12 @@ export const actions = {
         router.push('/login');
         return;
       }
+      console.log(data);
+      // console.log(JSON.stringify(data, null, 2));
 
       const { entities } = normalize(data, moduleSchema);
       const { modules, reactions } = entities;
+      console.log(reactions);
 
       commit(LOAD_MODULES, modules);
       commit(LOAD_REACTIONS, reactions);
@@ -151,14 +154,14 @@ export const actions = {
 };
 
 // Getters
-export const getActiveReactionId = alert => (state) => {
-  const reactionKeys = state.reactions ? Object.keys(state.reactions) : null;
-  const activeReaction = reactionKeys && reactionKeys.length > 0
-    ? reactionKeys.filter(reactionId => state.reactions[reactionId].active)[0]
+export const getActiveReactionId = alert => ({ reactions }, { selectedModuleName }) => {
+  const reactionIds = reactions ? Object.keys(reactions) : null;
+  const activeReactionId = reactionIds && reactionIds.length > 0
+    ? reactionIds.find(id => reactions[id].active && reactions[id].module === selectedModuleName)
     : null;
 
   const { NODE_ENV } = process.env;
-  if (!activeReaction) {
+  if (!activeReactionId) {
     const message = 'No active reactions were found. Make sure that you are logged in and that a reaction is active';
 
     if ((NODE_ENV === 'production' || NODE_ENV === 'test')) {
@@ -168,7 +171,7 @@ export const getActiveReactionId = alert => (state) => {
     throw new Error(message);
   }
 
-  return activeReaction;
+  return activeReactionId;
 };
 
 const getParamsKey = (selectedModuleName, actuatorName) => (
