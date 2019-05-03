@@ -36,16 +36,8 @@ var ReactionSchema = mongoose.Schema({
   Datalog: [{
     type :mongoose.Schema.Types.Mixed
   }],
-
   ModuleState : { type :mongoose.Schema.Types.Mixed },
-  // ModuleState : {},
-
-  active : {
-    type: Boolean,
-    required: true
-  }
-
-});
+}, { minimize: false });
 
 //Mongoose automatically creates a collection that pluralizes the model name reaction->reactions
 var Reaction = module.exports = mongoose.model('Reaction', ReactionSchema);

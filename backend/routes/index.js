@@ -497,20 +497,22 @@ function writeAllMeasurementsToInfluxFromMongo() {
 
 
 function mongoPersistActiveState(id, data, isActive) {
-    console.log('frim mongoPersistActiveState')
-    Reaction.find({'_id': id}, 'active',  (err, reactions) => {  // by id and return Datalog array, etc.
+    Reaction.find({'_id': id}, 'active ModuleState',  (err, reactions) => {  // by id and return Datalog array, etc.
                       if(err) return handleError(err);
                       //
                       if ( reactions.length !== 0) {
                           var reaction = reactions[0];
                           if ( reaction.active != isActive ) {  // event log of change .. does not change hardware
                               //
+                              var settings = reaction.ModuleState ? reaction.settings : {};
+
                               data.time = (new Date()).getTime();
                               data.active = isActive ? "ON" : "OFF";
+                              data.settings = settings;
                               //
                               Reaction.findByIdAndUpdate(
                                   { '_id' : id },
-                                  { ModuleState : data, active : isActive, test: "hello" },
+                                  { ModuleState : data, active : isActive, },
                                   function (err) {
                                       if(err) return handleError(err);
                                   });
@@ -851,7 +853,7 @@ function handleError(err) {
 global.loadRootAssets = async (userId, renderPage, res) => {
     //
     //
-    if ( gUserAssets[userId] == undefined ) {
+    if (gUserAssets[userId] == undefined ) {
         gUserAssets[userId] = new UserReactionsAssets(userId, dosisMods);
     }
 
@@ -895,7 +897,7 @@ global.loadRootAssets = async (userId, renderPage, res) => {
 
 }
 
-loadRootAssets('5cae6359108c4a19d00eb39d', null, { render(a,b){}, json(a,b){} });
+// loadRootAssets('5cae6359108c4a19d00eb39d', null, { render(a,b){}, json(a,b){} });
 
 //======  ======  ======   ======   ======   ======   ======   ======   ======   ======   ======   ======   ======
 
@@ -1110,9 +1112,7 @@ router.post(gURL_add, function(req, res){
                                  procedure: req.body.procedure,
                                  notes: req.body.notes,
                                  user: {id: req.user._id, name: req.user.username},
-                                 ModuleState : iniModuleState,
-                                //  ModuleState : {...iniModuleState, settings: {} },
-                                //  ModuleState : {},
+                                 ModuleState : {...iniModuleState, settings: {}},
                                  active : false
                                });
                                //
@@ -1283,18 +1283,6 @@ router.post(gURL_updateState, ensureAuthenticated, (req,res) => {
                                     }
                                 }
                             }
-
-            const ids = Object.keys(gReactionsToUser);
-            const dummy = ids.map(id => {
-              const modules = Object.keys(gReactionsToUser[id].allModulesActive);
-              modules.forEach(module => {
-                console.log(id);
-                console.log(module);
-                console.log(gReactionsToUser[id].allModulesActive[module].moduleState)
-                // print(gReactionsToUser[id].allModulesActive)
-              });
-              return gReactionsToUser[id].allModulesActive;
-            });                            
 
                             //
                             forwardToHardware(changeSet,mid,moduleStates,data);  // data contains the carries if any..
