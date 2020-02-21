@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
 
-
-PROJECT_PATH=/home/pi/hayden/lq_vue/backend
-
 deploy() {
-    cd $PROJECT_PATH  &&
+    cd /home/pi/hayden/lq_vue/backend &&
     git pull origin $1 &&
-    npm install &&
-    UART=/dev/ttyACM0 node server.js
+#    npm install &&
+    npm run pi
 }
 
 if [[ -z $1 ]]; then
@@ -21,5 +18,5 @@ git push origin $(git rev-parse --abbrev-ref HEAD)
 
 # TODO the -A option is not secure. Come up with a different solution
 # try this https://itnext.io/how-to-auto-deploy-your-app-with-one-command-12f9ac00d34a
-ssh sshpass -p $PILOPW ssh pi@$PILOIP "$(typeset -f deploy); deploy $(git rev-parse --abbrev-ref HEAD)"
+sshpass -p $PILOPW ssh pi@$PILOIP "$(typeset -f deploy); deploy $(git rev-parse --abbrev-ref HEAD)"
 
