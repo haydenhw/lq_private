@@ -26,7 +26,7 @@
   "devDependencies": {},
   "scripts": {
     "start": "UART=/dev/cu.usbmodem14201 nodemon server.js",
-    "pi": "UART=/dev/ttyACM0 forever start server.js",
+    "pi": "UART=/dev/ttyACM0 forever stopall && forever start server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

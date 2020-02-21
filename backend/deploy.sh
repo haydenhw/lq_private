@@ -19,4 +19,3 @@ git push origin $(git rev-parse --abbrev-ref HEAD)
 # TODO the -A option is not secure. Come up with a different solution
 # try this https://itnext.io/how-to-auto-deploy-your-app-with-one-command-12f9ac00d34a
 sshpass -p $PILOPW ssh pi@$PILOIP "$(typeset -f deploy); deploy $(git rev-parse --abbrev-ref HEAD)"
-
