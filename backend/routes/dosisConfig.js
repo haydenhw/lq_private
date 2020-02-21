@@ -100,7 +100,8 @@ module.exports = {
 
         uarts : [{
             // port : "/dev/ttyUSB0",
-            port : "/dev/cu.usbmodem14201",
+
+            port : process.env.UART,
             baud: 256000,
             mcu : "Prime1"
         },
