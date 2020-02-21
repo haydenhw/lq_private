@@ -429,7 +429,6 @@ function sendStateRequest (serverMessage) {
                 console.log("sendStateRequest");
                 console.log(opMessage);
                 uartPort.write(opMessage, () => {  // write the message with a callback.
-                    console.log('Write:\t\t Complete!');
                 });
             }
         }
@@ -472,7 +471,6 @@ function sendLimitCommand (serverMessage) {
             var opMessage = operationMessage(parseable);
             if (opMessage.length) {
                 uartPort.write(opMessage, () => {  // write the message with a callback.
-                    console.log('Write:\t\t Complete!');
                 });
             }
         }
@@ -635,7 +633,6 @@ function messageToHardware(serverMessage) {
                         logger.debug(opMessage);
                         if (opMessage.length) {
                             uartPort.write(opMessage, () => {  // write the message with a callback.
-                                console.log('Write:\t\t Complete!');
                                 // do an ack here if you want...
                             });
                         }
@@ -742,19 +739,18 @@ function handleMessages (message) {
 
 // Handle messages from the web server...
 process.on('message', (message) => {
-    // setTimeout(tester,1000);
-    //
-    console.log("messageToHardware")
-    console.dir(message, { depth: 4 });
-    console.log("__");
+    // console.log("messageToHardware")
+    // console.dir(message, { depth: 4 });
+    // console.log("__");
     //
 
     haltACKTimer("" + message.dest)
 
     // for light dimming feature only
     if (message.bypassThrottle) {
-        logger.debug('** Bypassing Throttle With Ligt Dim Message **');
-        messageToHardware(message);
+        logger.debug('** Bypassing Throttle With Light Dim Message **');
+        var uartPort = gMCUPortMap['Prime1'];
+        uartPort.write('Prime1,@' + message.data.level + '\n');
         return;
     }
 

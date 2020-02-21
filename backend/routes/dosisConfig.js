@@ -99,25 +99,27 @@ module.exports = {
         testing : false,
 
         uarts : [{
-            port : "/dev/ttyUSB0",
-            baud : 9600,
+            // port : "/dev/ttyUSB0",
+            port : "/dev/cu.usbmodem14201",
+            baud: 256000,
             mcu : "Prime1"
         },
-        {
-            port : "/dev/ttyUSB1",
-            baud : 9600,
-            mcu : "MV1"
-        },
-        {
-            port : "/dev/ttyUSB2",
-            baud : 9600,
-            mcu : "Prime2"
-        },
-        {
-            port : "/dev/ttyUSB3",
-            baud : 9600,
-            mcu : "MV2"
-        }]
+        // {
+        //     port : "/dev/ttyUSB1",
+        //     baud : 9600,
+        //     mcu : "MV1"
+        // },
+        // {
+        //     port : "/dev/ttyUSB2",
+        //     baud : 9600,
+        //     mcu : "Prime2"
+        // },
+        // {
+        //     port : "/dev/ttyUSB3",
+        //     baud : 9600,
+        //     mcu : "MV2"
+        // }
+     ]
 
     }
 
