@@ -64,12 +64,13 @@ global.subst = (a,b,c) => {
 }
 
 global.ensureAuthenticated = (req, res, next) => {
-    if ( req.isAuthenticated() ) {
+    
+    return next(); // disables auth
+    if (req.isAuthenticated() ) {
       return next();
     } else if (req.get('client') === 'vue-client') {
         res.json({ message: 'NOT_AUTHORIZED'});
     } else {
-        // req.flash('error', 'Not logged in');
         res.redirect('/users/login');
     }
 }
