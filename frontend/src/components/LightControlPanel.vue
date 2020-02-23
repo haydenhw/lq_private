@@ -40,7 +40,6 @@
 </template>
 
 <script>
-// remove light classes. replace with something more substantial
 import io from 'socket.io-client';
 import { mapActions, mapGetters } from 'vuex';
 import { UPDATE_MODULE_STATE, UPDATE_MODULE_PARAMS } from '@/store/actions.types';
@@ -69,10 +68,9 @@ export default {
     lampLevel() {
       return Number(this.lamp.level);
     },
-    },
   },
   mounted() {
-    socket.on('connect', () => { console.log('socket connected!'); });
+    socket.on('connect', () => { console.log('socket connected!') });
   },
   methods: {
     ...mapActions([UPDATE_MODULE_STATE, UPDATE_MODULE_PARAMS]),
