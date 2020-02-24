@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
+var User = require('../models/user');
 const { loadRootAssets } = require('./index');
 
-router.get('/', ensureAuthenticated, (req, res) => {
-    // const { id } = req.user;
-    const id = '5d181d20cde99fadc00f4f30';
-    loadRootAssets(id, null, res);
+router.get('/', ensureAuthenticated, async (req, res) => {
+    // For this branch we don't care which user is logged in. Any user id will do
+    const { _id } = await User.findOne({}).exec();
+    loadRootAssets(_id, null, res);
 });
 
 module.exports = router;
