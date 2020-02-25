@@ -792,15 +792,7 @@ router.setSocketIo = (io) => {
     const lampDimmer = io
     .of('/dimLamp')
     .on('connection', function(socket){
-
-console.log('socket connected')
-console.log('socket connected')
-console.log('socket connected')
-console.log('socket connected')
-console.log('socket connected')
-console.log('socket connected')
         socket.on('dim lamp', (lampData) => {
-console.log('hello')
             const { dest, id, level } = lampData
             const message = {
                 dest,
