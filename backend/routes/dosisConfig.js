@@ -1,5 +1,7 @@
 ﻿
-
+if (!process.env.UART) {
+    throw new Error('UART environment variable must be set')
+}
 
 module.exports = {
 

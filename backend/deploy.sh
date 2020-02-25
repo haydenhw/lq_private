@@ -7,6 +7,7 @@ deploy() {
     npm run pi
 }
 
+
 if [[ -z $1 ]]; then
   echo "Please enter a commit message"
   exit 1
