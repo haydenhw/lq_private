@@ -4,9 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "yarn copyBackendConfig && vue-cli-service serve",
-    "serve:offsite": " copyBackendConfig && vue-cli-service serve --mode offsite",
+    "debug": "yarn serve --mode debug",
     "build": "scripts/copyDist.sh",
-    "build:offsite": "yarn copyBackendConfig && vue-cli-service build --mode offsite",
     "lint": "vue-cli-service lint",
     "start": "concurrently \"cd ../backend && node server.js\" \"vue-cli-service serve\"",
     "test": "yarn test:unit",

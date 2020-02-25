@@ -52,6 +52,7 @@ import ControlPanelItem from './ControlPanelItem';
 import SwitchControl from './SwitchControl';
 import SliderControl from './SliderControl';
 
+console.log({ DIM_LAMP_SOCKET_URL })
 const socket = io(DIM_LAMP_SOCKET_URL);
 
 export default {

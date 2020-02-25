@@ -111,7 +111,7 @@ export const actions = {
       const { message } = data;
 
       if (message === 'NOT_AUTHORIZED') {
-        router.push('/login');
+        // router.push('/login');
         return;
       }
 
@@ -123,7 +123,7 @@ export const actions = {
       commit(FETCH_MODULES_SUCCESS);
 
       if (successRoute) {
-        router.push(successRoute);
+        // router.push(successRoute);
       }
     } catch (error) {
       console.log(error);
