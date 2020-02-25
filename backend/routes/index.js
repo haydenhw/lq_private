@@ -798,7 +798,7 @@ console.log('socket connected')
 console.log('socket connected')
 console.log('socket connected')
 console.log('socket connected')
-onsole.log('socket connected')
+console.log('socket connected')
         socket.on('dim lamp', (lampData) => {
 console.log('hello')
             const { dest, id, level } = lampData
