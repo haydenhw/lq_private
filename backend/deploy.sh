@@ -7,16 +7,18 @@ deploy() {
     npm run pi
 }
 
+if [[ $1  != "--skip-git" ]]; then
+    if [[ -z $1 ]]; then
+      echo "Please enter a commit message"
+      exit 1
+    fi
 
-if [[ -z $1 ]]; then
-  echo "Please enter a commit message"
-  exit 1
+    git pull &&
+    git add . &&
+    git commit -m "$1" &&
+    git push origin $(git rev-parse --abbrev-ref HEAD)
 fi
 
-git pull &&
-git add . &&
-git commit -m "$1" &&
-git push origin $(git rev-parse --abbrev-ref HEAD)
 
 # TODO the -A option is not secure. Come up with a different solution
 # try this https://itnext.io/how-to-auto-deploy-your-app-with-one-command-12f9ac00d34a
