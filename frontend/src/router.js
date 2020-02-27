@@ -8,12 +8,17 @@ export default new Router({
   base: process.env.BASE_URL,
   routes: [
     {
+      path: '/',
+      name: 'demo',
+      component: () => import('@/views/Demo'),
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('@/views/Login'),
     },
     {
-      path: '/',
+      path: '/controls',
       name: 'reactorControls',
       component: () => import('@/views/ReactorControls'),
     },

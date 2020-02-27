@@ -76,7 +76,7 @@ html, body {
   }
 }
 
-// TODO learn why this is needed
+// for animated transitions
 .view {
   position: fixed;
   width: 100%;
