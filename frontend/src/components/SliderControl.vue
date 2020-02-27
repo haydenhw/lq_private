@@ -3,7 +3,6 @@
 <template>
   <div class="slider-control">
     <div class="slider-control-slider">
-      <!-- Do I need the value prop belo0w ? -->
       <BaseSlider
         v-if="!isFetching"
         :slider-position="level"

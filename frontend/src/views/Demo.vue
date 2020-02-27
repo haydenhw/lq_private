@@ -7,12 +7,19 @@
         alt="live reactor stream"
       >
     </div>
-    <div class="demo-controls" />
+    <div class="demo-controls">
+       <DemoLightControl />
+    </div>
   </div>
 </template>
 
 <script>
+import DemoLightControl from '@/components/DemoLightControl';
+
 export default {
+  components: {
+    DemoLightControl,
+  },
   mounted() {
     const { video, videoContainer } = this.$refs;
     const { offsetWidth, offsetHeight } = videoContainer;
@@ -45,7 +52,7 @@ export default {
 
 
   .demo-controls {
-    background-color: lightseagreen;
+    padding: 24px;
     width: 100vw;
     height: 150px;
   }
