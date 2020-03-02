@@ -14,10 +14,6 @@ import { UPDATE_MODULE_STATE, UPDATE_MODULE_PARAMS } from '@/store/actions.types
 import { getPercentLabel } from '@/utils/controlPanel.utils';
 import { DIM_LAMP_SOCKET_URL } from '@/constants/api.constants';
 
-import BaseTimePicker from './BaseTimePicker';
-import ControlPanel from './ControlPanel';
-import ControlPanelItem from './ControlPanelItem';
-import SwitchControl from './SwitchControl';
 import SliderControl from './SliderControl';
 
 const socket = io(DIM_LAMP_SOCKET_URL);
@@ -60,7 +56,6 @@ export default {
 
 <style lang="scss" >
   .slider-control {
-    border: 1px solid #000;
     width: 100%;
   }
 
@@ -69,11 +64,14 @@ export default {
   }
 
   .slider-control-level {
-    border: 1px solid #000;
     margin-left: 0;
-    padding: 0 1em;
+    padding: 0 .5em;
     width: auto;
     text-align: center;
 
+  }
+
+  .noUi-connects {
+    background-color: #dddada;
   }
 </style>

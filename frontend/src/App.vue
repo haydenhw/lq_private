@@ -63,8 +63,6 @@ html, body {
 }
 
 .application {
-  background-image: url('assets/space-blue.jpg') !important;
-  background-size: cover !important;
   font-family: 'Roboto Condensed', sans-serif !important;
 }
 

@@ -1,12 +1,13 @@
-import { normalize } from 'normalizr';
+import {normalize} from 'normalizr';
 import router from '@/router';
 import callApi from '@/utils/api.utils.js';
-import { prettyPrint } from '@/utils/debug.utils.js';
-import { validatePayload } from '@/utils/entities.utils';
-import { moduleSchema } from '@/constants/schemas.constants';
-import { MODULES_URL, UPDATE_STATE_URL } from '@/constants/api.constants';
+import {prettyPrint} from '@/utils/debug.utils.js';
+import {validatePayload} from '@/utils/entities.utils';
+import {moduleSchema} from '@/constants/schemas.constants';
+import {MODULES_URL, UPDATE_STATE_URL} from '@/constants/api.constants';
+
 // TODO: refactor so that this comes from back end configuration
-import { modulesInitial } from './entities.initialState.js';
+import {modulesInitial} from './entities.initialState.js';
 import {
   HANDLE_UPDATE_STATE_MESSAGE,
   UPDATE_MODULE_PARAMS,
@@ -38,21 +39,21 @@ export const mutations = {
   [LOAD_REACTIONS](state, reactions) {
     state.reactions = reactions;
   },
-  [MUTATE_MODULE_STATE](state, { moduleName, actuatorType, newState }) {
+  [MUTATE_MODULE_STATE](state, {moduleName, actuatorType, newState}) {
     state.modules[moduleName].moduleState[actuatorType] = newState;
   },
-  [MUTATE_MODULE_PARAMS](state, { moduleName, actuatorType, newParams }) {
-    const { level } = newParams;
+  [MUTATE_MODULE_PARAMS](state, {moduleName, actuatorType, newParams}) {
+    const {level} = newParams;
     // the api requires level to be a string. Ensure that that is the case
     newParams = level && typeof level === 'number'
-      ? Object.assign({}, newParams, { level: String(level) })
+      ? Object.assign({}, newParams, {level: String(level)})
       : newParams;
 
     const currentParams = state.modules[moduleName].parameters;
     const currentParamsValues = currentParams[actuatorType];
     currentParams[actuatorType] = Object.assign({}, currentParamsValues, newParams);
   },
-  [MUTATE_MODULE_LIMITS](state, { moduleName, actuatorType, newLimits }) {
+  [MUTATE_MODULE_LIMITS](state, {moduleName, actuatorType, newLimits}) {
     const currentLimits = state.modules[moduleName].limits;
     const currentLimitsValues = currentLimits[actuatorType];
     currentLimits[actuatorType] = Object.assign({}, currentLimitsValues, newLimits);
@@ -61,11 +62,11 @@ export const mutations = {
 
 // TODO: refactor to handle errors
 export const getModuleUpdateAction = (mutationType, validatePayload, callApi, updateUrl) => (
-  { commit, getters },
+  {commit, getters},
   mutationPayload,
 ) => {
-  const { selectedModuleName } = getters;
-  mutationPayload = Object.assign({}, mutationPayload, { moduleName: selectedModuleName });
+  const {selectedModuleName} = getters;
+  mutationPayload = Object.assign({}, mutationPayload, {moduleName: selectedModuleName});
   validatePayload(mutationPayload);
 
   // console.log('\n', '** Mutation Payload **');
@@ -73,7 +74,7 @@ export const getModuleUpdateAction = (mutationType, validatePayload, callApi, up
 
   commit(mutationType, mutationPayload);
 
-  const { actuatorType } = mutationPayload;
+  const {actuatorType} = mutationPayload;
   const requestPayload = getters[`${actuatorType.toLowerCase()}UpdatePayload`];
   validatePayload(requestPayload);
 
@@ -88,7 +89,7 @@ export const getModuleUpdateAction = (mutationType, validatePayload, callApi, up
 
 export const actions = {
   [HANDLE_UPDATE_STATE_MESSAGE](
-    { commit, state },
+    {commit, state},
     {
       message, stateDiffGetter, moduleGetter, objectDiffGetter, mutationType,
     },
@@ -103,20 +104,20 @@ export const actions = {
     }
   },
   // TODO: add logic to handle fetch failure
-  async [FETCH_MODULES]({ commit }, successRoute) {
+  async [FETCH_MODULES]({commit}, successRoute) {
     // If user is logged in 'data' will contain an array of module data.
     // Otherwise 'data' will contain an error message.
     try {
-      const { data } = await callApi(MODULES_URL);
-      const { message } = data;
+      const {data} = await callApi(MODULES_URL);
+      const {message} = data;
 
       if (message === 'NOT_AUTHORIZED') {
         // router.push('/login');
         return;
       }
 
-      const { entities } = normalize(data, moduleSchema);
-      const { modules, reactions } = entities;
+      const {entities} = normalize(data, moduleSchema);
+      const {modules, reactions} = entities;
 
       commit(LOAD_MODULES, modules);
       commit(LOAD_REACTIONS, reactions);
@@ -157,13 +158,10 @@ export const getActiveReactionId = alert => (state) => {
     ? reactionKeys.filter(reactionId => state.reactions[reactionId].active)[0]
     : null;
 
-  const { NODE_ENV } = process.env;
   if (!activeReaction) {
     const message = 'No active reactions were found. Make sure that you are logged in and that a reaction is active';
 
-    if ((NODE_ENV === 'production' || NODE_ENV === 'test')) {
-      alert(message);
-    }
+    alert(message);
 
     throw new Error(message);
   }
@@ -198,7 +196,7 @@ export const getApiUpdatePayload = actuatorName => (
 
   // TODO move this logic to a separate function
   const limits = targetLimits
-    ? { 'HIGH-value': targetLimits['HIGH-value'], 'LOW-value': targetLimits['LOW-value'] }
+    ? {'HIGH-value': targetLimits['HIGH-value'], 'LOW-value': targetLimits['LOW-value']}
     : {};
 
   let apiPayload = {
@@ -215,7 +213,7 @@ export const getApiUpdatePayload = actuatorName => (
   // TODO refactor so that both extraction and water props aren't included in the same request
   if (actuatorName === 'water' || actuatorName === 'extraction') {
     const specialParams = {
-      [paramsKey]: Object.assign({}, { 'material-rate': '0', 'material-amount': '0', level: '100' }),
+      [paramsKey]: Object.assign({}, {'material-rate': '0', 'material-amount': '0', level: '100'}),
     };
 
     apiPayload = Object.assign({}, apiPayload, specialParams);
@@ -224,21 +222,21 @@ export const getApiUpdatePayload = actuatorName => (
   return apiPayload;
 };
 
-const getHeater = (state, { activeModuleState, activeModuleParams, activeModuleLimits }) => ({
+const getHeater = (state, {activeModuleState, activeModuleParams, activeModuleLimits}) => ({
   powerOn: activeModuleState.Heater,
   level: activeModuleParams.Heater.level,
   minTemp: activeModuleLimits.Heater['LOW-value'],
   maxTemp: activeModuleLimits.Heater['HIGH-value'],
 });
 
-const getLamp = (state, { activeModuleState, activeModuleParams }) => ({
+const getLamp = (state, {activeModuleState, activeModuleParams}) => ({
   powerOn: activeModuleState.Lamp,
   level: activeModuleParams.Lamp.level,
   start: activeModuleParams.Lamp.start,
   stop: activeModuleParams.Lamp.stop,
 });
 
-const getActiveModule = (state, { selectedModuleName }) => {
+const getActiveModule = (state, {selectedModuleName}) => {
   const activeModule = state.modules[selectedModuleName];
   if (!activeModule) {
     console.log('Selected Module Name:', selectedModuleName, '\n\n');
@@ -252,12 +250,12 @@ const getActiveModule = (state, { selectedModuleName }) => {
 export const getters = {
   activeReactionId: getActiveReactionId(window.alert),
   activeModule: getActiveModule,
-  activeModuleParams: (state, { activeModule }) => activeModule.parameters,
-  activeModuleState: (state, { activeModule }) => activeModule.moduleState,
-  activeModuleLimits: (state, { activeModule }) => activeModule.limits,
-  air: (state, { activeModuleState }) => activeModuleState.Air,
-  water: (state, { activeModuleState }) => activeModuleState.water,
-  extraction: (state, { activeModuleState }) => activeModuleState.extraction,
+  activeModuleParams: (state, {activeModule}) => activeModule.parameters,
+  activeModuleState: (state, {activeModule}) => activeModule.moduleState,
+  activeModuleLimits: (state, {activeModule}) => activeModule.limits,
+  air: (state, {activeModuleState}) => activeModuleState.Air,
+  water: (state, {activeModuleState}) => activeModuleState.water,
+  extraction: (state, {activeModuleState}) => activeModuleState.extraction,
   heater: getHeater,
   lamp: getLamp,
   airUpdatePayload: getApiUpdatePayload('Air'),

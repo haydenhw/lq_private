@@ -1,7 +1,7 @@
 import axios from 'axios';
 import router from '@/router';
 
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 axios.defaults.headers.common.client = 'vue-client';
 
 const callApi = async (url, options = {}) => {

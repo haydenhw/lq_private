@@ -64,7 +64,7 @@ global.subst = (a,b,c) => {
 }
 
 global.ensureAuthenticated = (req, res, next) => {
-    
+
     return next(); // disables auth
     if (req.isAuthenticated() ) {
       return next();
@@ -164,6 +164,7 @@ app.use(cors({
     "http://192.168.1.99:8080",
     "http://192.168.1.53:8080",
     "http://mush.local:8080",
+    "http://mush.local:300",
     "http://lq.local:8080",
   ],
   credentials: true,

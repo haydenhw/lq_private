@@ -125,8 +125,11 @@ export default {
 <style scoped lang="scss">
 @import "../styles/variables";
 
+
 .reactor-controls {
   height: 100%;
+  background-image: url('../assets/space-blue.jpg') !important;
+  background-size: cover !important;
 }
 
 .rc-header {

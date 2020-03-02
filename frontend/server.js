@@ -1,8 +1,8 @@
 const express = require('express');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8887;
 const app = express();
 
-app.use('/vue/', express.static('dist'));
+app.use(express.static('dist'));
 
 app.listen(PORT, () => console.log(`Vue client is running on port ${PORT}!`));

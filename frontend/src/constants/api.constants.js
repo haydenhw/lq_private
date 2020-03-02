@@ -1,27 +1,49 @@
-const NODE_ENV = process.env.VUE_APP_DEBUG === 'true' ? 'production' : process.env.NODE_ENV;
+const routerDNS = 'hayden-rpi.duckdns.org';
+const pi2IP = '10.0.0.236';
+const apiPort = 8888;
+const pi4IP = '10.0.0.177';
+const livestreamPort = 8082;
 
-const PI_HOSTNAME = '10.0.0.25';
-const SERVER_PORT = '8888';
+let livestreamUrl;
+let apiUrl;
+switch (process.env.NODE_ENV) {
+  case 'production':
+    livestreamUrl = `${routerDNS}:${livestreamPort}`;
+    apiUrl = `${routerDNS}:${apiPort}`;
+    break;
+  case 'staging':
+    livestreamUrl = `${pi4IP}:${livestreamPort}`;
+    apiUrl = `${pi2IP}:${apiPort}`;
+    break;
+  default:
+    livestreamUrl = `${pi4IP}:${livestreamPort}`
+    apiUrl = `localhost:${apiPort}`;
+}
 
-const PI_BASE_URL = `http://${PI_HOSTNAME}:${SERVER_PORT}`;
-const DEV_BASE_URL = `http://${window.location.hostname}:${SERVER_PORT}`;
+livestreamUrl = `http://${livestreamUrl}`;
+apiUrl = `http://${apiUrl}`;
 
-// SOCKET URLS
-export const SENSOR_DATA_SOCKET_URL = `${PI_BASE_URL}/data`;
-export const DIM_LAMP_SOCKET_URL = NODE_ENV === 'production'
-  ? `${PI_BASE_URL}/dimLamp`
-  : `${DEV_BASE_URL}/dimLamp`;
+export const API_BASE_URL = apiUrl;
 
-// REST URLS
-export const API_BASE_URL = NODE_ENV === 'production'
-  ? PI_BASE_URL
-  : DEV_BASE_URL;
-
-if (API_BASE_URL !== '' && NODE_ENV !== 'test') {
+if (API_BASE_URL !== '' && process.env.NODE_ENV !== 'test') {
   console.log(`Http requests will be made to: ${API_BASE_URL}`);
 }
 
+// SOCKET URLS
+export const SENSOR_DATA_SOCKET_URL = `${API_BASE_URL}/data`;
+export const DIM_LAMP_SOCKET_URL =`${API_BASE_URL}/dimLamp`;
+
+// REST URLS
+export const LIVESTREAM_URL = `${livestreamUrl}/video`;
 export const LOGIN_URL = `${API_BASE_URL}/users/login`;
 export const LOGOUT_URL = `${API_BASE_URL}/users/logout`;
 export const MODULES_URL = `${API_BASE_URL}/modules`;
 export const UPDATE_STATE_URL = `${API_BASE_URL}/updateState`;
+
+
+
+
+
+
+
+
