@@ -21,7 +21,7 @@ const callApi = async (url, options = {}) => {
       // alert('Please log in before making any requests');
     } else {
       const message = 'Please make sure the server is running';
-      alert(`${error}\n${message}`);
+      // alert(`${error}\n${message}`);
       throw new Error(error);
     }
   }

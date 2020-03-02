@@ -2,12 +2,17 @@
   <div class="demo grey lighten-3">
     <div class="demo-container">
       <div class="card">
+        <div class="reactor-card-temp">
+          <span class="reactor-card-temp-val">{{ formatSensorData(sensorData, 'Prime1').temperature }}</span>
+          <span class="reactor-card-data-unit reactor-card-temp-unit">°C</span>
+        </div>
         <img class="livestream" :src="livestreamUrl" alt="">
         <div class="demo-controls">
           <div class="light-control">
             <div class="light-control-label">
               <span class="icon-sun"></span>
             </div>
+
             <DemoLightControl/>
           </div>
         </div>
@@ -17,8 +22,10 @@
 </template>
 
 <script>
-  import { LIVESTREAM_URL } from '@/constants/api.constants';
+  import {LIVESTREAM_URL} from '@/constants/api.constants';
   import DemoLightControl from '@/components/DemoLightControl';
+  import callApi from "../utils/api.utils";
+  import {mapState} from "vuex";
 
   export default {
     components: {
@@ -29,24 +36,38 @@
         livestreamUrl: LIVESTREAM_URL,
       }
     },
-    mounted() {
-      return;
-      const {video, videoContainer} = this.$refs;
-      const {offsetWidth, offsetHeight} = videoContainer;
-      video.style.width = `${offsetWidth}px`;
-      video.style.height = `${offsetHeight}px`;
+    computed: {
+      ...mapState({
+        sensorData: state => state.sensors,
+      }),
+      formatSensorData() {
+        return (sensorData, moduleName) => {
+          const {temperature, OD} = sensorData[moduleName];
+          const numTemp = Number(temperature);
+          const numOD = Number(OD);
 
-      window.addEventListener('resize', () => {
-        const {offsetWidth, offsetHeight} = videoContainer;
-        video.style.width = `${offsetWidth}px`;
-        video.style.height = `${offsetHeight}px`;
-      });
+          // eslint-disable-next-line
+          if (isNaN(numTemp) || isNaN(numOD)) {
+            return {
+              temperature,
+              OD,
+            };
+          }
+
+          const oneDecimalTemp = numTemp.toFixed(2);
+          const twoDecimalOD = numOD.toFixed(2);
+
+          return {
+            temperature: oneDecimalTemp,
+            OD: twoDecimalOD,
+          };
+        };
+      },
     },
   };
 </script>
 
 <style>
-
   .demo {
     height: 100%;
     color: black;
@@ -61,9 +82,8 @@
   }
 
   .livestream {
-    height: 100%;
     width: 100%;
-    max-height: 75vh;
+    height: 75vh;
     overflow: hidden;
   }
 
@@ -84,5 +104,21 @@
 
   .icon-sun {
     font-size: 1.7em;
+  }
+
+  .card {
+    position: relative;
+  }
+
+  .reactor-card-temp {
+    position: absolute;
+    top:0;
+    right: 4px;
+    font-size: 2em;
+  }
+
+  .reactor-card-data-unit {
+    vertical-align: super;
+    font-size: .5em;
   }
 </style>
